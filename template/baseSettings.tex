@@ -1,0 +1,621 @@
+% [usedPackages.tex]-[baseSettings.tex]
+
+% !字体和版式设置
+% #region
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm} % 设定页边距
+%\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi] % 字体设置
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Sans SC Medium},
+    ItalicFont={Kaiti SC}
+]
+\setCJKsansfont{Source Han Sans SC}[BoldFont={Source Han Sans SC Bold}]
+\newCJKfontfamily\fangsong{FangSong}
+\newCJKfontfamily\heavyfont{Source Han Serif SC Heavy}
+\setCJKmonofont{PingFang SC}
+\let\cleardoublepage\clearpage % 取消自动跨页
+\ctexset{
+    chapter/name={},
+    chapter/number=\arabic{chapter},
+    chapter/format={},
+    chapter/aftername={},
+    chapter/beforeskip=0pt,
+    chapter/afterskip=0pt,
+}
+\setmathfont{latinmodern-math.otf}
+\setmathfont[range={"2205}, Scale=MatchUppercase]{STIX Two Math} % 设置空集符号样式
+\allowdisplaybreaks
+\raggedbottom
+
+
+% 设置正文Chapter样式
+\titleformat{\chapter}[display]
+    {\raggedright} % 整体左对齐
+    {
+        {\fontsize{40pt}{50pt}\selectfont\bfseries C}
+        {\fontsize{25pt}{40pt}\selectfont\bfseries \!hapter~}
+        {\fontsize{40pt}{50pt}\selectfont\bfseries \thechapter}
+    }
+    {-15pt} % 标签和标题之间的垂直距离
+    {\huge\heavyfont #1}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+% 设置正文Section样式
+\tcbset{
+    sectionbox/.style={
+        enhanced,
+        capture=hbox,           % 宽度自适应
+        % 去掉背景色 (设为白色，或者用 standard jigsaw, opacityback=0 做透明)
+        colback=white,
+        colframe=black,         % 边框颜色
+        boxrule=0.5pt,          % 先把所有边框归零(去掉上下边框)
+        leftrule=3pt,           % 左边框加粗 (比如 3pt)
+        rightrule=3pt,          % 右边框加粗
+        arc=5pt,                
+        left=15pt, right=15pt,
+        top=6pt, bottom=6pt,
+        fontupper=\Large\bfseries,
+    }
+}
+\titleformat{\section}
+    {\normalfont}
+    {}                       % 标签留空
+    {0pt}                    % 间距
+    {\begin{tcolorbox}[sectionbox]
+        \S\thesection\quad #1
+    \end{tcolorbox}}
+\titlespacing{\section}{0pt}{0pt}{-20pt} % 调整标题周围的间距 (左, 上, 下)
+
+\sisetup{
+    per-mode = reciprocal,
+    inter-unit-product = \ensuremath{\cdot}
+}
+
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{L}{>{\hbadness=10000\relax}X}
+
+% #endregion
+
+
+% !设置封面
+% #region
+\makeatletter
+\newcommand{\covertitle}[1]{\def\@covertitle{#1}}
+\newcommand{\coverengtitle}[1]{\def\@coverengtitle{#1}}
+\newcommand{\coverauthor}[1]{\def\@coverauthor{#1}}
+\newcommand{\coverdate}[1]{\def\@coverdate{#1}}
+\newcommand{\covergithub}[1]{\def\@covergithub{#1}}
+\newcommand{\coverorcid}[1]{\def\@coverorcid{#1}}
+\def\@covertitle{主标题}
+\def\@coverengtitle{English Title}
+\def\@coverauthor{Your Name}
+\def\@coverdate{\today}
+\def\@covergithub{https://github.com}
+\def\@coverorcid{https://orcid.org}
+
+\newcommand{\makemycover}{
+    \definecolor{covertext1}{HTML}{A49883}
+    \definecolor{covertext2}{HTML}{B19F87}
+    \begin{titlepage}
+        \newgeometry{margin=0pt}
+        \centering
+        \begin{tikzpicture}[remember picture, overlay]
+            \node[anchor=south west, inner sep=0pt] at (current page.south west) {
+                \includegraphics[width=\paperwidth, height=\paperheight]{setting/cover.pdf}
+            };
+
+            \node[anchor=north, inner sep=0pt] at ([shift={(0.82cm, 9.2cm)}]current page.center) {
+                \begin{tabular}{c}
+                    {\fontsize{60pt}{72pt}\selectfont\heavyfont \@covertitle} \\ [0.8cm]
+                    {\fontsize{27pt}{40pt}\selectfont\calligra \@coverengtitle}
+                \end{tabular}
+            };
+
+            \node[anchor=south west, inner sep=0pt, text=covertext1] at ([shift={(3.5cm, 1cm)}]current page.south west) {
+                \begin{tabular}{l}
+                    {\fontsize{16pt}{30pt}\selectfont \bfseries Updated:\!\!} \ {\fontsize{16pt}{30pt}\selectfont \bfseries \today}\\
+                    {\fontsize{16pt}{30pt}\selectfont \bfseries Created:} \ {\fontsize{16pt}{30pt}\selectfont \bfseries \@coverdate}\\
+                    {\fontsize{16pt}{30pt}\selectfont \bfseries Author:~} \ {\fontsize{16pt}{30pt}\selectfont \bfseries \@coverauthor}
+                \end{tabular}
+            };
+
+            \node[anchor=south west, rotate=90, text=covertext2] at ([shift={(1.5cm, 1cm)}]current page.south west) {
+                {\fontsize{24pt}{35pt}\selectfont {\calligra Powered by} \bfseries \LaTeX}
+            };
+
+            \node[anchor=south, inner sep=0pt] at ([shift={(0.82cm, 8cm)}]current page.south west) {
+                \begin{tabular}{c}
+                    \href{\@coverorcid}{\color{covertext2}\fontsize{20pt}{24pt}\selectfont \faOrcid} \\[0.1cm]
+                    \href{\@covergithub}{\color{covertext2}\fontsize{20pt}{24pt}\selectfont \faGithub}
+                \end{tabular}
+            };
+        \end{tikzpicture}
+        \vfill
+    \end{titlepage}
+    \restoregeometry
+}
+\makeatother
+% #endregion
+
+
+% !设置目录
+% #region
+\titleformat{name={\chapter},numberless}[block]
+    {\Huge\heavyfont}
+    {}
+    {0pt}
+    {#1}
+\titlecontents{chapter}
+    [0pt]                   % 左边距
+    {\addvspace{1em}\bfseries} % 上方间距 + 字体加粗
+    {Chapter~\thecontentslabel\hspace{1em}}
+    {}                      % 无编号时的格式
+    {\hfill\contentspage}   % 页码右对齐
+\makeatletter
+\newcommand{\makecontents}{
+    \let\oldcleardoublepage\cleardoublepage
+    \let\cleardoublepage\clearpage
+    \frontmatter
+    \pagestyle{plain}
+    \begingroup
+        \ctexset{contentsname = {目~录}}
+        \tableofcontents
+    \endgroup
+    \mainmatter
+    \let\cleardoublepage\oldcleardoublepage
+}
+\makeatother
+% #endregion
+
+
+% !文本框设置
+% #region
+
+% 推导紫*
+\definecolor{PurpleDeep}{HTML}{82218B}       % 核心紫
+\definecolor{PurpleLight}{HTML}{F9F2F9}      % 极浅紫背景
+
+% 重点橙
+\definecolor{OrangeDeep}{HTML}{FE6304}       % 核心橙
+\definecolor{OrangeLight}{HTML}{FFF6F0}      % 极浅橙背景
+
+% 解答绿*
+\definecolor{GreenDeep}{HTML}{007355}        % 核心绿
+\definecolor{GreenLight}{HTML}{F0F8F6}       % 极浅绿背景
+
+% 禁止红*
+\definecolor{RedDeep}{HTML}{D20000}          % 核心红
+\definecolor{RedLight}{HTML}{FEF2F2}         % 极浅红背景
+
+% 定义黄
+\definecolor{YellowDeep}{HTML}{F59A23}       % 核心黄
+\definecolor{YellowLight}{HTML}{FEF9F2}      % 极浅黄背景
+
+% 定理蓝*
+\definecolor{BlueDeep}{HTML}{3070B6}         % 核心蓝
+\definecolor{BlueLight}{HTML}{F2F6FA}        % 极浅蓝背景
+
+% 例题灰*
+\definecolor{GrayDeep}{HTML}{4C5E75}         % 核心灰
+\definecolor{GrayLight}{HTML}{F4F6F8}        % 极浅灰背景
+
+% 定义通用样式模板
+\tcbset{
+    myThemStyle/.style={
+        enhanced,
+        breakable,
+        arc=4pt,            % 圆角大小 
+        outer arc=4pt,
+        boxrule=0.5pt,      % 普通边框线宽 
+        leftrule=3pt,       % 关键：用稍粗的左边框替代 leftbar 参数 
+        toprule=0.5pt,
+        rightrule=0.5pt,
+        bottomrule=0.5pt,
+        fonttitle=\bfseries,
+        coltitle=black,
+        attach title to upper, % 标题嵌入正文
+        after title={.\ },     % 标题后的标点
+        left=8pt,              % 左边距 
+    }
+}
+\tcbset{
+    myTitleStyle/.style={
+        enhanced,
+        breakable,
+        arc=4pt,            % 圆角大小
+        outer arc=4pt,
+        boxrule=0.5pt,      % 普通边框线宽
+        leftrule=3pt,       % 保持左边框加粗的视觉识别度
+        toprule=0.5pt,
+        rightrule=0.5pt,
+        bottomrule=0.5pt,
+        fonttitle=\bfseries,
+        coltitle=white,     % 标题栏文字默认为白色
+        toptitle=3pt,       % 标题栏内部上边距 (微调以垂直居中)
+        bottomtitle=3pt,    % 标题栏内部下边距
+        left=8pt,           % 内容区左边距
+        right=8pt,          % 内容区右边距
+        top=4pt,            % 内容区上边距
+        bottom=4pt,         % 内容区下边距
+    }
+}
+
+% 定义“定理”环境
+\newcounter{theorem}[section]
+\renewcommand{\thetheorem}{\thesection-\arabic{theorem}}
+\newtcolorbox{theorem}[1][]{
+    myThemStyle,
+    colback=BlueLight,   % 背景色
+    colframe=BlueDeep,   % 边框色
+    before upper={
+        \refstepcounter{theorem}
+        \textcolor{BlueDeep}{\textbf{定理~\thetheorem}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{BlueDeep}\faAtom};
+    },
+    #1
+}
+
+% 定义“引理”环境
+\newcounter{lemma}[theorem]
+\renewcommand{\thelemma}{\thesection-\arabic{theorem}(\arabic{lemma})}
+\newtcolorbox{lemma}[1][]{
+    myThemStyle,
+    colback=BlueLight,   % 背景色
+    colframe=BlueDeep,   % 边框色
+    before upper={
+        \refstepcounter{lemma}
+        \textcolor{BlueDeep}{\textbf{引理~\thelemma}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{BlueDeep}\faAtom};
+    },
+    #1
+}
+
+% 定义“定义”环境
+\newcounter{definition}[section]
+\renewcommand{\thedefinition}{\thesection-\arabic{definition}}
+\newtcolorbox{definition}[1][]{
+    myThemStyle,
+    colback=YellowLight,   % 背景色
+    colframe=YellowDeep,   % 边框色
+    before upper={
+        \refstepcounter{definition}
+        \textcolor{YellowDeep}{\textbf{定义~\thedefinition}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{YellowDeep}\faLayerGroup};
+    },
+    #1
+}
+
+% 定义“命题”环境
+\newcounter{proposition}[subsection]
+\renewcommand{\theproposition}{\arabic{proposition}}
+\newtcolorbox{proposition}[1][]{
+    myThemStyle,
+    colback=OrangeLight,   % 背景色
+    colframe=OrangeDeep,   % 边框色
+    before upper={
+        \refstepcounter{proposition}
+        \textcolor{OrangeDeep}{\textbf{命题~\theproposition}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{OrangeDeep}\faPencil*};
+    },
+    #1
+}
+
+% 定义“推导”环境
+\newtcolorbox{derivation}[1][]{
+    myThemStyle,
+    colback=PurpleLight,   % 背景色
+    colframe=PurpleDeep,   % 边框色
+    before upper={
+        \textcolor{PurpleDeep}{\textbf{推导}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{PurpleDeep}\faRandom};
+    },
+    #1
+}
+
+% 定义“误区”环境
+\newtcolorbox{mistake}[1][]{
+    myTitleStyle,
+    colback=RedLight,   % 背景色
+    colframe=RedDeep,   % 边框色
+    before upper={
+        \textcolor{RedDeep}{\textbf{误区}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{RedDeep}\faExclamation};
+    },
+    #1
+}
+
+% 定义“问题”与“解答(证明)”环境
+\newcounter{question}[subsection]
+\renewcommand{\thequestion}{\arabic{question}}
+\newtcolorbox{question}[1][]{
+    myThemStyle,
+    colback=GrayLight,   % 背景色
+    colframe=GrayDeep,   % 边框色
+    before upper={
+        \refstepcounter{question}
+        \textcolor{GrayDeep}{\textbf{问题~\thequestion}}~
+    },
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{GrayDeep}\faQuestion};
+    },
+    #1
+}
+\newtcolorbox{solution}[1][]{
+    myTitleStyle,               % 调用通用标题栏样式
+    colback=GreenLight,         % 内容背景色
+    colframe=GreenDeep,         % 边框颜色
+    colbacktitle=GreenDeep,     % 标题栏背景色
+    title={解答}, % 自动编号标题 (关联问题的编号)
+    after title={\hfill \faAngleDown},
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{GreenDeep}\faCheckDouble};
+    },
+    #1                          % 允许传入额外参数
+}
+% 定义“证明”环境
+\makeatletter
+\@ifundefined{proof}{}{\let\proof\relax \let\endproof\relax}
+\makeatother
+\newtcolorbox{proof}[1][]{
+    myTitleStyle,               % 调用通用标题栏样式
+    colback=GreenLight,         % 内容背景色
+    colframe=GreenDeep,         % 边框颜色
+    colbacktitle=GreenDeep,     % 标题栏背景色
+    title={证明}, % 自动编号标题 (关联问题的编号)
+    after title={\hfill \faAngleDown},
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{GreenDeep}\faSquare[regular]};
+    },
+    #1                          % 允许传入额外参数
+}
+
+
+\newtcolorbox{extension}[2][]{
+    myTitleStyle,               % 调用通用标题栏样式
+    colback=PurpleLight,         % 内容背景色（建议根据需要调整色值）
+    colframe=PurpleDeep,         % 边框颜色
+    colbacktitle=PurpleDeep,     % 标题栏背景色
+    title={#2},                 % 核心修改：使用第二个必选参数作为标题
+    after title={\hfill \faAngleDown},
+    overlay unbroken and last={
+        \node[anchor=south east, inner sep=6pt] 
+            at (frame.south east) {\color{PurpleDeep}\faPaperclip};
+    },
+    #1                          % 允许传入额外参数（如调整边距等）
+}
+
+
+% --- 5. 适配 cleveref 引用 (可选) ---
+\crefname{solution}{解答}{解答}
+\crefformat{solution}{#2解答~#1#3}
+% #endregion
+
+
+% !列表样式设置
+% #region
+\SetEnumitemKey{circ}{ % 圆圈上标有序列表样式
+    label=\bfseries\itshape\arabic*\,${}^\circ$,
+    itemsep=0pt,
+    labelindent=0.7em,
+    parsep=0pt,
+    leftmargin=*
+}
+\SetEnumitemKey{property}{ % 性质有序列表样式
+    label=\colorbox{black}{\textcolor{white}{\bfseries 性质\,\arabic*}},
+    leftmargin=0pt,
+    itemindent=*
+}
+\newsavebox{\solbox}
+\SetEnumitemKey{solution}{%
+    label={%
+        \begingroup
+        \setlength{\fboxsep}{2pt}% 1. 缩小内边距（控制整体高度）
+        \sbox{\solbox}{\textcolor{white}{\bfseries 解法}}% 2. 测量“解法”二字的真实尺寸
+        \fcolorbox{black}{black}{\textcolor{white}{\usebox{\solbox}}}%
+        \,\fbox{%
+            % 3. 动态将内部宽度设为与“解法”总高度相等，确保构成标准正方形
+            \makebox[\dimexpr\ht\solbox+\dp\solbox\relax][c]{%
+                \vphantom{\usebox{\solbox}}\smash{\itshape\bfseries\!\arabic*}%
+            }%
+        }%
+        \endgroup
+    },%
+    itemsep=0pt,%
+    leftmargin=0pt,%
+    itemindent=*%
+}
+
+% 无序列表全局样式
+\setlist[itemize,1]{label={\faCaretRight},leftmargin=2em}
+\setlist[itemize,2]{label={\faAngleRight},leftmargin=1em}
+% #endregion
+
+
+% !图表标题与引用设置
+% #region
+\DeclareCaptionFont{fangsong}{\fangsong} % 使用ctex的仿宋命令
+\captionsetup[table]{
+	skip = 0pt,
+    labelsep = quad
+}
+\captionsetup[figure]{
+	labelsep = quad,
+	justification = centering,
+    skip = 0pt
+}
+
+% 表格列样式设置
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
+\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
+
+% 参数含义 1、单数名称；2、复数名称
+\captionsetup[subfigure]{labelformat=simple}
+\renewcommand{\thesubfigure}{(\alph{subfigure})} % 子图编号样式设置
+\crefalias{subfigure}{figure} % 强制子图使用图类型
+
+\newcommand{\crefpairconjunction}{、\!}
+\newcommand{\crefrangeconjunction}{\,-\,}
+\newcommand{\crefmiddleconjunction}{、\!}
+\newcommand{\creflastconjunction}{和}
+
+\crefname{chapter}{}{}
+\Crefname{chapter}{}{}
+\creflabelformat{chapter}{\,#2#1#3\,}
+\crefrangelabelformat{chapter}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{chapter}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{chapter}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{chapter}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{chapter}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{section}{}{}
+\Crefname{section}{}{}
+\creflabelformat{section}{\,#2#1#3\,}
+\crefrangelabelformat{section}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{section}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{section}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{section}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{section}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{subsection}{}{}
+\Crefname{subsection}{}{}
+\creflabelformat{subsection}{\,#2#1#3\,}
+\crefrangelabelformat{subsection}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{subsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{subsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{subsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{subsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{subsubsection}{}{}
+\Crefname{subsubsection}{}{}
+\creflabelformat{subsubsection}{\,#2#1#3\,}
+\crefrangelabelformat{subsubsection}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{subsubsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{subsubsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{subsubsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{subsubsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{table}{表}{表}
+\Crefname{table}{表}{表}
+\creflabelformat{table}{#2\!#1#3\,}
+\crefrangelabelformat{table}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{table}{#2表\,#1#3\,}{、\!#2表\,#1#3\,}{、\!#2表\,#1#3\,}{和#2表\,#1#3\,}
+\Crefmultiformat{table}{#2表\,#1#3\,}{、\!#2表\,#1#3\,}{、\!#2表\,#1#3\,}{和#2表\,#1#3\,}
+\crefrangemultiformat{table}{#3表\,#1#4\,-\,#5#2#6\,}{、\!#3表\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3表\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{table}{#3表\,#1#4\,-\,#5#2#6\,}{、\!#3表\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3表\,#1#4\,-\,#5#2#6\,}
+
+\crefname{figure}{图}{图}
+\Crefname{figure}{图}{图}
+\creflabelformat{figure}{#2\!#1#3\,}
+\crefrangelabelformat{figure}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{figure}{#2图\,#1#3\,}{、\!#2图\,#1#3\,}{、\!#2图\,#1#3\,}{和#2图\,#1#3\,}
+\Crefmultiformat{figure}{#2图\,#1#3\,}{、\!#2图\,#1#3\,}{、\!#2图\,#1#3\,}{和#2图\,#1#3\,}
+\crefrangemultiformat{figure}{#3图\,#1#4\,-\,#5#2#6\,}{、\!#3图\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3图\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{figure}{#3图\,#1#4\,-\,#5#2#6\,}{、\!#3图\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3图\,#1#4\,-\,#5#2#6\,}
+
+\crefname{equation}{式}{式}
+\Crefname{equation}{式}{式}
+\creflabelformat{equation}{#2\!#1#3\,}
+\crefrangelabelformat{equation}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{equation}{#2式\,#1#3\,}{、\!#2式\,#1#3\,}{、\!#2式\,#1#3\,}{和#2式\,#1#3\,}
+\Crefmultiformat{equation}{#2式\,#1#3\,}{、\!#2式\,#1#3\,}{、\!#2式\,#1#3\,}{和#2式\,#1#3\,}
+\crefrangemultiformat{equation}{#3式\,#1#4\,-\,#5#2#6\,}{、\!#3式\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3式\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{equation}{#3式\,#1#4\,-\,#5#2#6\,}{、\!#3式\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3式\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\theoremname}{\color{BlueDeep}~\faAtom~\bfseries 定理}
+\crefname{theorem}{\theoremname}{\theoremname}
+\Crefname{theorem}{\theoremname}{\theoremname}
+\creflabelformat{theorem}{#2\!#1#3\,}
+\crefrangelabelformat{theorem}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{theorem}{#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{和#2\theoremname\,#1#3\,}
+\Crefmultiformat{theorem}{#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{和#2\theoremname\,#1#3\,}
+\crefrangemultiformat{theorem}{#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\theoremname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{theorem}{#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\theoremname\,#1#4\,-\,#5#2#6\,}
+
+\crefname{lemma}{引理}{引理}
+\Crefname{lemma}{引理}{引理}
+\creflabelformat{lemma}{#2\!#1#3\,}
+\crefrangelabelformat{lemma}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{lemma}{#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{和#2引理\,#1#3\,}
+\Crefmultiformat{lemma}{#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{和#2引理\,#1#3\,}
+\crefrangemultiformat{lemma}{#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3引理\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{lemma}{#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3引理\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\definitionname}{\color{YellowDeep}~\faLayerGroup~\bfseries 定义}
+\crefname{definition}{\definitionname}{\definitionname}
+\Crefname{definition}{\definitionname}{\definitionname}
+\creflabelformat{definition}{#2\!#1#3\,}
+\crefrangelabelformat{definition}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{definition}{#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{和#2\definitionname\,#1#3\,}
+\Crefmultiformat{definition}{#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{和#2\definitionname\,#1#3\,}
+\crefrangemultiformat{definition}{#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\definitionname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{definition}{#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\definitionname\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\questionname}{\color{GrayDeep}~\faQuestion~\bfseries 问题}
+\crefname{question}{\questionname}{\questionname}
+\Crefname{question}{\questionname}{\questionname}
+\creflabelformat{question}{#2\!#1#3\,}
+\crefrangelabelformat{question}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{question}{#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{和#2\questionname\,#1#3\,}
+\Crefmultiformat{question}{#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{和#2\questionname\,#1#3\,}
+\crefrangemultiformat{question}{#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\questionname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{question}{#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\questionname\,#1#4\,-\,#5#2#6\,}
+
+% 引用上标设置
+\let\citeoriginal\cite
+\RenewDocumentCommand{\cite}{m}
+    {\textsuperscript{\citeoriginal{#1}}}
+% #endregion
+
+
+% !页眉页脚样式设置
+% #region
+\fancypagestyle{myheader}{
+	\fancyhf{} % 清除默认设置
+	\renewcommand{\headrulewidth}{0pt} % 取消页眉横线
+	\fancyfoot[C]{\thepage} % 页脚底部页码（可自定义）
+}
+\pagestyle{myheader}  % 启用 fancy 页眉
+\pagenumbering{arabic} % 设置页码格式是阿拉伯数字
+\setcounter{page}{1}
+% #endregion
+
+
+% !雪豹闭嘴
+% #region
+% 隐去siunitx包和physics包的冲突报警
+\AtBeginDocument{\RenewCommandCopy\qty\SI}
+\ExplSyntaxOn
+\msg_redirect_name:nnn{siunitx}{physics-pkg}{none}
+\ExplSyntaxOff
+
+% 解决unicode-math包导致的字体冲突问题
+\AtBeginDocument{
+    \let\mathbb\relax
+    \DeclareMathAlphabet{\mathbb}{U}{msb}{m}{n}
+}
+
+\WarningFilter{caption}{Unused \captionsetup}
+\vbadness=10000
+% #endregion
+
+% [baseSettings.tex]-[myCommands.tex]

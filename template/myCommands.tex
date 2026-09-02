@@ -1,0 +1,12 @@
+% [baseSettings.tex]-[myCommands.tex]
+
+% !设置自定义功能
+\newcommand{\vect}[1]{\symbf{#1}} % 粗体向量
+\newcommand{\overtext}[2]{\stackon[0.5pt]{\textbf{#1}}{\textsf{\textbf{\fontsize{5pt}{5pt}\selectfont #2}}}} % 文本顶部英文
+\newcommand{\dashedmid}{\mathrel{\tikz[baseline=0pt]{\draw[dashed, dash pattern=on 2.4pt off 2.4pt, line width=0.6pt] (0,-0.55ex) -- (0,1.85ex);}}} % 虚竖线
+\newcommand{\ee}{\mathrm{e}} % 正体自然常数e
+\newcommand{\ii}{\mathrm{i}} % 正体虚数i
+\newcommand{\circnum}[1]{{\bfseries\itshape{#1}\,${}^\circ$}} % 圆圈序号
+\newcommand{\wiki}[1]{\href{#1}{\raisebox{1.2ex}{\textcolor{black}{\scriptsize\faWikipediaW}}}} % wiki图标超链接
+\newcommand{\video}[1]{\href{#1}{\raisebox{1.2ex}{\textcolor{black}{\scriptsize\faPlayCircle[regular]}}}} % 视频超链接
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}

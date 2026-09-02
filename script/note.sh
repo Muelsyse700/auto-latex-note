@@ -1,0 +1,223 @@
+#!/bin/bash
+
+SOURCE="${BASH_SOURCE[0]}"
+
+while [ -L "$SOURCE" ]; do
+    DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+
+SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+TARGET_DIR="$(pwd)"
+
+RESET='\033[0m'
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+CYAN='\033[36m'
+BLUE='\033[34m'
+MAGENTA='\033[35m'
+BOLD='\033[1m'
+
+usage() {
+    printf '%b\n' "${CYAN}${BOLD}note.sh${RESET}"
+    printf 'latexNote 工具管理器\n'
+    printf '\n'
+    printf '%b\n' "${CYAN}用法${RESET}"
+    printf '  note.sh              打开工具菜单\n'
+    printf '  note.sh -h           显示帮助信息\n'
+}
+
+get_description() {
+    local file="$1"
+    local line
+
+    line="$(grep -m 1 -E '^[[:space:]]*(#[[:space:]]*)?@description:' "$file" 2>/dev/null || true)"
+
+    if [ -n "$line" ]; then
+        printf '%s\n' "$line" |
+            sed -E 's/^[[:space:]]*(#[[:space:]]*)?@description:[[:space:]]*//'
+    else
+        printf '%s' "无描述"
+    fi
+}
+
+run_script() {
+    local script="$1"
+    shift
+
+    case "$script" in
+        *.py)
+            if ! command -v python3 >/dev/null 2>&1; then
+                printf '%b\n' "${RED}错误：当前环境未找到 python3${RESET}"
+                return 1
+            fi
+
+            python3 "$script" "$@"
+            ;;
+
+        *.sh)
+            "$script" "$@"
+            ;;
+
+        *)
+            printf '%b\n' "${RED}错误：不支持的脚本类型${RESET}"
+            return 1
+            ;;
+    esac
+}
+
+wait_after_execution() {
+    local choice
+
+    printf '\n'
+    printf '%b' "${CYAN}按 Enter 返回菜单，按 q 退出：${RESET}"
+    read -r choice
+
+    if [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then
+        printf '%b\n' "${GREEN}已退出${RESET}"
+        exit 0
+    fi
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    usage
+    exit 0
+fi
+
+if [ $# -gt 0 ]; then
+    printf '%b\n' "${RED}错误：未知参数 $1${RESET}"
+    printf '使用 -h 查看帮助信息\n'
+    exit 1
+fi
+
+declare -a SCRIPT_FILES
+declare -a SCRIPT_NAMES
+declare -a SCRIPT_DESCRIPTIONS
+
+while IFS= read -r -d '' file; do
+    name="$(basename "$file")"
+
+    [ "$file" -ef "$SOURCE" ] && continue
+
+    description="$(get_description "$file")"
+
+    SCRIPT_FILES+=("$file")
+    SCRIPT_NAMES+=("$name")
+    SCRIPT_DESCRIPTIONS+=("$description")
+done < <(
+    find "$SCRIPT_DIR" -maxdepth 1 -type f \
+        \( -name "*.sh" -o -name "*.py" \) \
+        -print0 |
+        sort -z
+)
+
+while true; do
+    printf '\033c'
+
+    printf '%b\n' "${CYAN}${BOLD}latexNote 工具${RESET}"
+    printf '当前目录：%s\n' "$TARGET_DIR"
+    printf '\n'
+
+    printf '%b\n' "${MAGENTA}${BOLD}=== 工具链 ===${RESET}"
+
+    printf '%b' "${YELLOW}  1${RESET}) "
+    printf '%b\n' "${BLUE}初始化工具链${RESET}"
+    printf '     初始化当前目录的 latexNote 项目\n'
+
+    printf '%b' "${YELLOW}  2${RESET}) "
+    printf '%b\n' "${BLUE}更新模板工具链${RESET}"
+    printf '     更新当前目录的 latexNote 模板\n'
+
+    printf '\n'
+    printf '%b\n' "${MAGENTA}${BOLD}=== 脚本工具 ===${RESET}"
+
+    start=3
+
+    if [ "${#SCRIPT_FILES[@]}" -eq 0 ]; then
+        printf '  暂无可用脚本\n'
+    else
+        for i in "${!SCRIPT_FILES[@]}"; do
+            number=$((start + i))
+
+            printf '%b' "${YELLOW}  ${number}${RESET}) "
+            printf '%b\n' "${GREEN}${SCRIPT_NAMES[$i]}${RESET}"
+            printf '     %s\n' "${SCRIPT_DESCRIPTIONS[$i]}"
+        done
+    fi
+
+    printf '\n'
+    printf '%b\n' "${YELLOW}  q${RESET}) 退出"
+    printf '\n'
+
+    printf '%b' "${CYAN}请选择：${RESET}"
+    read -r input
+
+    if [ "$input" = "q" ] || [ "$input" = "Q" ]; then
+        printf '%b\n' "${GREEN}已退出${RESET}"
+        exit 0
+    fi
+
+    if [ -z "$input" ]; then
+        continue
+    fi
+
+    read -r choice args <<< "$input"
+
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        printf '%b\n' "${RED}无效的选项${RESET}"
+        sleep 1
+        continue
+    fi
+
+    if [ "$choice" -eq 1 ]; then
+        printf '\n%b\n' "${CYAN}正在执行 ${BLUE}初始化工具链${CYAN} ...${RESET}"
+
+        if [[ "$args" == "-h" || "$args" == "--help" ]]; then
+            run_script "$SCRIPT_DIR/init-update.sh" "$args"
+        else
+            run_script "$SCRIPT_DIR/init-update.sh" "$TARGET_DIR"
+        fi
+
+        printf '\n%b\n' "${GREEN}初始化工具链执行完成${RESET}"
+        wait_after_execution
+        continue
+    fi
+
+    if [ "$choice" -eq 2 ]; then
+        printf '\n%b\n' "${CYAN}正在执行 ${BLUE}更新模板工具链${CYAN} ...${RESET}"
+
+        if [[ "$args" == "-h" || "$args" == "--help" ]]; then
+            run_script "$SCRIPT_DIR/init-update.sh" "$args"
+        else
+            run_script "$SCRIPT_DIR/init-update.sh" "$TARGET_DIR" -u
+        fi
+
+        printf '\n%b\n' "${GREEN}更新模板工具链执行完成${RESET}"
+        wait_after_execution
+        continue
+    fi
+
+    index=$((choice - start))
+
+    if [ "$index" -lt 0 ] || [ "$index" -ge "${#SCRIPT_FILES[@]}" ]; then
+        printf '%b\n' "${RED}无效的选项${RESET}"
+        sleep 1
+        continue
+    fi
+
+    script="${SCRIPT_FILES[$index]}"
+    name="${SCRIPT_NAMES[$index]}"
+
+    printf '\n%b\n' "${CYAN}正在执行 ${GREEN}${name}${CYAN} ...${RESET}"
+
+    if [[ "$args" == "-h" || "$args" == "--help" ]]; then
+        run_script "$script" "$args"
+    else
+        run_script "$script" "$TARGET_DIR"
+    fi
+
+    printf '\n%b\n' "${GREEN}${name} 执行完成${RESET}"
+    wait_after_execution
+done

@@ -1,0 +1,83 @@
+# ======================
+# macOS
+# ======================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# ======================
+# Python
+# ======================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+# ======================
+# LaTeX
+# ======================
+
+# 编译辅助文件
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.xdv
+
+# SyncTeX
+*.synctex.gz
+
+# latexmk
+*.run.xml
+
+# 临时文件
+*.bak
+*.swp
+*.tmp
+
+
+# ======================
+# IDE
+# ======================
+
+.vscode/
+.idea/
+
+
+# ======================
+# Build directories
+# ======================
+
+build/
+dist/
+output/
+
+
+# ======================
+# Logs
+# ======================
+
+*.log

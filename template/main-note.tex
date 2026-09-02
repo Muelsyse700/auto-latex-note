@@ -1,0 +1,29 @@
+%! TeX root = ./main.tex
+% !编译配方：xelatex*2
+% !请务必选择该配方，若无该配方，请手动编译两次xelatex或自行定义该编译配方
+
+\documentclass[a4paper,12pt,fontset=none,UTF8]{ctexbook}
+\usepackage{setting/latexNote}
+\graphicspath{{figure/}}
+% #设置封面主标题
+\covertitle{}
+% #设置封面英文标题
+\coverengtitle{}
+% #设置作者姓名
+\coverauthor{Xu Jiamin}
+% #设置创建日期(留空默认为今日)
+\coverdate{}
+% #设置github主页
+\covergithub{https://github.com/Muelsyse700}
+% #设置ORCID
+\coverorcid{https://orcid.org/0009-0005-1071-7800}
+
+
+\begin{document}
+\makemycover
+\makecontents
+% --------正文--------
+
+\input{chapter/chapter1.tex}
+
+\end{document}
