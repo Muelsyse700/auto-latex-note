@@ -112,13 +112,12 @@ if [ "$UPDATE_MODE" = true ]; then
     printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}.gitignore${RESET}"
 
     # 重新生成 latexNote.sty
-    printf '%b\n' "${CYAN}正在重新生成 setting/latexNote.sty ...${RESET}"
-    "$SCRIPT_DIR/make-sty.sh" "$TARGET_DIR"
-    mv "$TARGET_DIR/latexNote.sty" "$TARGET_DIR/setting/latexNote.sty"
-    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/latexNote.sty${RESET}"
+    printf '%b\n' "${CYAN}正在重新生成 setting/core-setting.tex ...${RESET}"
+    "$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
+    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/core-setting.tex${RESET}"
 
     printf '\n'
-    printf '%b\n' "${CYAN}=== latexNote 更新完成 ===${RESET}"
+    printf '%b\n' "${CYAN}=== auto-latex-note 更新完成 ===${RESET}"
     printf '%b\n' "${YELLOW}提示：若需更新 main-note.tex 中的内容，请手动调整。${RESET}"
     exit 0
 fi
@@ -145,8 +144,7 @@ printf '%b\n' "${GREEN}✓ 已创建目录结构${RESET}"
 
 "$SCRIPT_DIR/make-main-note.sh" "$TARGET_DIR"
 
-"$SCRIPT_DIR/make-sty.sh" "$TARGET_DIR"
-mv "$TARGET_DIR/latexNote.sty" "$TARGET_DIR/setting/latexNote.sty"
+"$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
 
 if [ ! -f "$TEMPLATE_DIR/cover.pdf" ]; then
     printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/cover.pdf${RESET}"
@@ -181,5 +179,5 @@ git -C "$TARGET_DIR" commit -m "Initial commit"
 printf '%b\n' "${GREEN}✓ 已提交 Initial commit${RESET}"
 
 printf '\n'
-printf '%b\n' "${CYAN}=== latexNote 初始化完成 ===${RESET}"
+printf '%b\n' "${CYAN}=== auto-latex-note 初始化完成 ===${RESET}"
 printf '%b\n' "${YELLOW}提示：首次编译请使用 XeLaTeX*2${RESET}"

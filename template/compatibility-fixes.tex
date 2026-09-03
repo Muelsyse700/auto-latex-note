@@ -1,0 +1,28 @@
+% @order: 8
+% @description: 处理宏包兼容性问题、冲突修复以及无关警告屏蔽
+
+% !雪豹闭嘴
+% #region
+
+% 隐去siunitx包和physics包的冲突报警
+\AtBeginDocument{
+    \RenewCommandCopy\qty\SI
+}
+
+\ExplSyntaxOn
+\msg_redirect_name:nnn{siunitx}{physics-pkg}{none}
+\ExplSyntaxOff
+
+
+% 解决unicode-math包导致的字体冲突问题
+\AtBeginDocument{
+    \let\mathbb\relax
+    \DeclareMathAlphabet{\mathbb}{U}{msb}{m}{n}
+}
+
+
+% 屏蔽无意义警告
+\WarningFilter{caption}{Unused \captionsetup}
+\vbadness=10000
+
+% #endregion

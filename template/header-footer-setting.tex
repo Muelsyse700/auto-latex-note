@@ -1,0 +1,14 @@
+% @order: 7
+% @description: 设置页面页眉页脚样式、页码格式以及默认页面样式
+
+% !页眉页脚样式设置
+% #region
+\fancypagestyle{myheader}{
+	\fancyhf{} % 清除默认设置
+	\renewcommand{\headrulewidth}{0pt} % 取消页眉横线
+	\fancyfoot[C]{\thepage} % 页脚底部页码（可自定义）
+}
+\pagestyle{myheader}  % 启用 fancy 页眉
+\pagenumbering{arabic} % 设置页码格式是阿拉伯数字
+\setcounter{page}{1}
+% #endregion

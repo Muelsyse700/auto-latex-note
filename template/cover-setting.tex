@@ -1,0 +1,123 @@
+% @order: 2
+% @description: 定义封面信息接口、封面生成命令以及封面页面样式
+
+% !设置封面
+% #region
+
+\makeatletter
+
+% 封面信息接口
+\newcommand{\covertitle}[1]{\def\@covertitle{#1}}
+\newcommand{\coverengtitle}[1]{\def\@coverengtitle{#1}}
+\newcommand{\coverauthor}[1]{\def\@coverauthor{#1}}
+\newcommand{\coverdate}[1]{\def\@coverdate{#1}}
+\newcommand{\covergithub}[1]{\def\@covergithub{#1}}
+\newcommand{\coverorcid}[1]{\def\@coverorcid{#1}}
+
+% 默认封面信息
+\def\@covertitle{主标题}
+\def\@coverengtitle{English Title}
+\def\@coverauthor{Your Name}
+\def\@coverdate{\today}
+\def\@covergithub{https://github.com}
+\def\@coverorcid{https://orcid.org}
+
+
+% 生成封面
+\newcommand{\makemycover}{
+    
+    % 封面颜色
+    \definecolor{covertext1}{HTML}{A49883}
+    \definecolor{covertext2}{HTML}{B19F87}
+
+    \begin{titlepage}
+
+        \newgeometry{margin=0pt}
+
+        \centering
+
+        \begin{tikzpicture}[remember picture, overlay]
+
+            % 背景图片
+            \node[anchor=south west, inner sep=0pt]
+            at (current page.south west) {
+                \includegraphics[
+                    width=\paperwidth,
+                    height=\paperheight
+                ]{setting/cover.pdf}
+            };
+
+
+            % 主标题
+            \node[
+                anchor=north,
+                inner sep=0pt
+            ]
+            at ([shift={(0.82cm, 9.2cm)}]current page.center) {
+                \begin{tabular}{c}
+                    {\fontsize{60pt}{72pt}\selectfont\heavyfont \@covertitle}\\[0.8cm]
+                    {\fontsize{27pt}{40pt}\selectfont\calligra \@coverengtitle}
+                \end{tabular}
+            };
+
+
+            % 信息区域
+            \node[
+                anchor=south west,
+                inner sep=0pt,
+                text=covertext1
+            ]
+            at ([shift={(3.5cm,1cm)}]current page.south west) {
+                \begin{tabular}{l}
+                    {\fontsize{16pt}{30pt}\selectfont\bfseries Updated:\!\!}
+                    \ {\fontsize{16pt}{30pt}\selectfont\bfseries\today}\\
+                    {\fontsize{16pt}{30pt}\selectfont\bfseries Created:}
+                    \ {\fontsize{16pt}{30pt}\selectfont\bfseries\@coverdate}\\
+                    {\fontsize{16pt}{30pt}\selectfont\bfseries Author:~}
+                    \ {\fontsize{16pt}{30pt}\selectfont\bfseries\@coverauthor}
+                \end{tabular}
+            };
+
+
+            % Powered by LaTeX
+            \node[
+                anchor=south west,
+                rotate=90,
+                text=covertext2
+            ]
+            at ([shift={(1.5cm,1cm)}]current page.south west) {
+                {\fontsize{24pt}{35pt}\selectfont
+                {\calligra Powered by} \bfseries\LaTeX}
+            };
+
+
+            % ORCID/GitHub
+            \node[
+                anchor=south,
+                inner sep=0pt
+            ]
+            at ([shift={(0.82cm,8cm)}]current page.south west) {
+                \begin{tabular}{c}
+                    \href{\@coverorcid}{
+                        \color{covertext2}
+                        \fontsize{20pt}{24pt}\selectfont\faOrcid
+                    }\\[0.1cm]
+                    \href{\@covergithub}{
+                        \color{covertext2}
+                        \fontsize{20pt}{24pt}\selectfont\faGithub
+                    }
+                \end{tabular}
+            };
+
+        \end{tikzpicture}
+
+        \vfill
+
+    \end{titlepage}
+
+    \restoregeometry
+}
+
+\makeatother
+
+% #endregion

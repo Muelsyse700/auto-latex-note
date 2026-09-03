@@ -1,0 +1,55 @@
+% @order: 5
+% @description: 定义有序列表与无序列表样式，包括自定义编号标签和全局列表格式
+
+% !列表样式设置
+% #region
+
+\SetEnumitemKey{circ}{
+    label=\bfseries\itshape\arabic*\,${}^\circ$,
+    itemsep=0pt,
+    labelindent=0.7em,
+    parsep=0pt,
+    leftmargin=*
+}
+
+\SetEnumitemKey{property}{
+    label=\colorbox{black}{\textcolor{white}{\bfseries 性质\,\arabic*}},
+    leftmargin=0pt,
+    itemindent=*
+}
+
+\newsavebox{\solbox}
+
+\SetEnumitemKey{solution}{%
+    label={%
+        \begingroup
+        \setlength{\fboxsep}{2pt}
+        \sbox{\solbox}{\textcolor{white}{\bfseries 解法}}
+        \fcolorbox{black}{black}{\textcolor{white}{\usebox{\solbox}}}%
+        \,\fbox{%
+            \makebox[
+                \dimexpr\ht\solbox+\dp\solbox\relax
+            ][c]{%
+                \vphantom{\usebox{\solbox}}
+                \smash{\itshape\bfseries\!\arabic*}%
+            }%
+        }%
+        \endgroup
+    },
+    itemsep=0pt,
+    leftmargin=0pt,
+    itemindent=*
+}
+
+% 无序列表全局样式
+\setlist[itemize,1]{
+    label={\faCaretRight},
+    leftmargin=2em
+}
+
+\setlist[itemize,2]{
+    label={\faAngleRight},
+    leftmargin=1em
+}
+
+% #endregion

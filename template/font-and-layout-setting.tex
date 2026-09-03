@@ -1,0 +1,112 @@
+% @order: 1
+% @description: 全局字体、页面布局、章节标题、数学字体以及基础排版样式设置
+
+% !字体和版式设置
+% #region
+
+% 页面布局
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+}
+
+% 中文字体设置
+%\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Sans SC Medium},
+    ItalicFont={Kaiti SC}
+]
+\setCJKsansfont{Source Han Sans SC}[
+    BoldFont={Source Han Sans SC Bold}
+]
+\newCJKfontfamily\fangsong{FangSong}
+\newCJKfontfamily\heavyfont{Source Han Serif SC Heavy}
+\setCJKmonofont{PingFang SC}
+
+% 数学字体设置
+\setmathfont{latinmodern-math.otf}
+\setmathfont[
+    range={"2205},
+    Scale=MatchUppercase
+]{STIX Two Math}
+
+% 文档分页与数学排版
+\let\cleardoublepage\clearpage
+\allowdisplaybreaks
+
+% 页面垂直对齐
+\raggedbottom
+
+% 章节名称设置
+\ctexset{
+    chapter/name={},
+    chapter/number=\arabic{chapter},
+    chapter/format={},
+    chapter/aftername={},
+    chapter/beforeskip=0pt,
+    chapter/afterskip=0pt,
+}
+
+% Chapter样式
+\titleformat{\chapter}[display]
+    {\raggedright}
+    {
+        {\fontsize{40pt}{50pt}\selectfont\bfseries C}
+        {\fontsize{25pt}{40pt}\selectfont\bfseries \!hapter~}
+        {\fontsize{40pt}{50pt}\selectfont\bfseries \thechapter}
+    }
+    {-15pt}
+    {\huge\heavyfont #1}
+
+\titlespacing*{\chapter}
+    {0pt}
+    {-20pt}
+    {30pt}
+
+% Section样式
+\tcbset{
+    sectionbox/.style={
+        enhanced,
+        capture=hbox,
+        colback=white,
+        colframe=black,
+        boxrule=0.5pt,
+        leftrule=3pt,
+        rightrule=3pt,
+        arc=5pt,
+        left=15pt,
+        right=15pt,
+        top=6pt,
+        bottom=6pt,
+        fontupper=\Large\bfseries,
+    }
+}
+
+\titleformat{\section}
+    {\normalfont}
+    {}
+    {0pt}
+    {
+        \begin{tcolorbox}[sectionbox]
+            \S\thesection\quad #1
+        \end{tcolorbox}
+    }
+
+\titlespacing{\section}
+    {0pt}
+    {0pt}
+    {-20pt}
+
+% 单位格式
+\sisetup{
+    per-mode = reciprocal,
+    inter-unit-product = \ensuremath{\cdot}
+}
+
+% 表格格式
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{L}{>{\hbadness=10000\relax}X}
+
+% #endregion

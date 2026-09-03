@@ -1,0 +1,140 @@
+% @order: 6
+% @description: 设置图表标题格式、表格列样式以及 cleveref 交叉引用显示格式
+
+% !图表标题与引用设置
+% #region
+\DeclareCaptionFont{fangsong}{\fangsong} % 使用ctex的仿宋命令
+\captionsetup[table]{
+	skip = 0pt,
+    labelsep = quad
+}
+\captionsetup[figure]{
+	labelsep = quad,
+	justification = centering,
+    skip = 0pt
+}
+
+% 表格列样式设置
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
+\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
+
+% 参数含义 1、单数名称；2、复数名称
+\captionsetup[subfigure]{labelformat=simple}
+\renewcommand{\thesubfigure}{(\alph{subfigure})} % 子图编号样式设置
+\crefalias{subfigure}{figure} % 强制子图使用图类型
+
+\newcommand{\crefpairconjunction}{、\!}
+\newcommand{\crefrangeconjunction}{\,-\,}
+\newcommand{\crefmiddleconjunction}{、\!}
+\newcommand{\creflastconjunction}{和}
+
+\crefname{chapter}{}{}
+\Crefname{chapter}{}{}
+\creflabelformat{chapter}{\,#2#1#3\,}
+\crefrangelabelformat{chapter}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{chapter}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{chapter}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{chapter}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{chapter}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{section}{}{}
+\Crefname{section}{}{}
+\creflabelformat{section}{\,#2#1#3\,}
+\crefrangelabelformat{section}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{section}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{section}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{section}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{section}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{subsection}{}{}
+\Crefname{subsection}{}{}
+\creflabelformat{subsection}{\,#2#1#3\,}
+\crefrangelabelformat{subsection}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{subsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{subsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{subsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{subsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{subsubsection}{}{}
+\Crefname{subsubsection}{}{}
+\creflabelformat{subsubsection}{\,#2#1#3\,}
+\crefrangelabelformat{subsubsection}{#3#1#4\,-\,#5#2#6}
+\crefmultiformat{subsubsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\Crefmultiformat{subsubsection}{#2#1#3}{、#2#1#3}{、#2#1#3}{和#2#1#3}
+\crefrangemultiformat{subsubsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+\Crefrangemultiformat{subsubsection}{#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{、#3#1#4\,-\,#5#2#6}{和#3#1#4\,-\,#5#2#6}
+
+\crefname{table}{表}{表}
+\Crefname{table}{表}{表}
+\creflabelformat{table}{#2\!#1#3\,}
+\crefrangelabelformat{table}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{table}{#2表\,#1#3\,}{、\!#2表\,#1#3\,}{、\!#2表\,#1#3\,}{和#2表\,#1#3\,}
+\Crefmultiformat{table}{#2表\,#1#3\,}{、\!#2表\,#1#3\,}{、\!#2表\,#1#3\,}{和#2表\,#1#3\,}
+\crefrangemultiformat{table}{#3表\,#1#4\,-\,#5#2#6\,}{、\!#3表\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3表\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{table}{#3表\,#1#4\,-\,#5#2#6\,}{、\!#3表\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3表\,#1#4\,-\,#5#2#6\,}
+
+\crefname{figure}{图}{图}
+\Crefname{figure}{图}{图}
+\creflabelformat{figure}{#2\!#1#3\,}
+\crefrangelabelformat{figure}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{figure}{#2图\,#1#3\,}{、\!#2图\,#1#3\,}{、\!#2图\,#1#3\,}{和#2图\,#1#3\,}
+\Crefmultiformat{figure}{#2图\,#1#3\,}{、\!#2图\,#1#3\,}{、\!#2图\,#1#3\,}{和#2图\,#1#3\,}
+\crefrangemultiformat{figure}{#3图\,#1#4\,-\,#5#2#6\,}{、\!#3图\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3图\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{figure}{#3图\,#1#4\,-\,#5#2#6\,}{、\!#3图\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3图\,#1#4\,-\,#5#2#6\,}
+
+\crefname{equation}{式}{式}
+\Crefname{equation}{式}{式}
+\creflabelformat{equation}{#2\!#1#3\,}
+\crefrangelabelformat{equation}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{equation}{#2式\,#1#3\,}{、\!#2式\,#1#3\,}{、\!#2式\,#1#3\,}{和#2式\,#1#3\,}
+\Crefmultiformat{equation}{#2式\,#1#3\,}{、\!#2式\,#1#3\,}{、\!#2式\,#1#3\,}{和#2式\,#1#3\,}
+\crefrangemultiformat{equation}{#3式\,#1#4\,-\,#5#2#6\,}{、\!#3式\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3式\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{equation}{#3式\,#1#4\,-\,#5#2#6\,}{、\!#3式\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3式\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\theoremname}{\color{BlueDeep}~\faAtom~\bfseries 定理}
+\crefname{theorem}{\theoremname}{\theoremname}
+\Crefname{theorem}{\theoremname}{\theoremname}
+\creflabelformat{theorem}{#2\!#1#3\,}
+\crefrangelabelformat{theorem}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{theorem}{#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{和#2\theoremname\,#1#3\,}
+\Crefmultiformat{theorem}{#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{、\!#2\theoremname\,#1#3\,}{和#2\theoremname\,#1#3\,}
+\crefrangemultiformat{theorem}{#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\theoremname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{theorem}{#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\theoremname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\theoremname\,#1#4\,-\,#5#2#6\,}
+
+\crefname{lemma}{引理}{引理}
+\Crefname{lemma}{引理}{引理}
+\creflabelformat{lemma}{#2\!#1#3\,}
+\crefrangelabelformat{lemma}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{lemma}{#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{和#2引理\,#1#3\,}
+\Crefmultiformat{lemma}{#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{、\!#2引理\,#1#3\,}{和#2引理\,#1#3\,}
+\crefrangemultiformat{lemma}{#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3引理\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{lemma}{#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3引理\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3引理\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\definitionname}{\color{YellowDeep}~\faLayerGroup~\bfseries 定义}
+\crefname{definition}{\definitionname}{\definitionname}
+\Crefname{definition}{\definitionname}{\definitionname}
+\creflabelformat{definition}{#2\!#1#3\,}
+\crefrangelabelformat{definition}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{definition}{#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{和#2\definitionname\,#1#3\,}
+\Crefmultiformat{definition}{#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{、\!#2\definitionname\,#1#3\,}{和#2\definitionname\,#1#3\,}
+\crefrangemultiformat{definition}{#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\definitionname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{definition}{#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\definitionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\definitionname\,#1#4\,-\,#5#2#6\,}
+
+\newcommand{\questionname}{\color{GrayDeep}~\faQuestion~\bfseries 问题}
+\crefname{question}{\questionname}{\questionname}
+\Crefname{question}{\questionname}{\questionname}
+\creflabelformat{question}{#2\!#1#3\,}
+\crefrangelabelformat{question}{#3\!#1#4\,-\,#5#2#6\,}
+\crefmultiformat{question}{#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{和#2\questionname\,#1#3\,}
+\Crefmultiformat{question}{#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{、\!#2\questionname\,#1#3\,}{和#2\questionname\,#1#3\,}
+\crefrangemultiformat{question}{#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\questionname\,#1#4\,-\,#5#2#6\,}
+\Crefrangemultiformat{question}{#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\questionname\,#1#4\,-\,#5#2#6\,}{、\!#3\,#1#4\,-\,#5#2#6\,}{和#3\questionname\,#1#4\,-\,#5#2#6\,}
+
+\crefname{solution}{解答}{解答}
+\crefformat{solution}{#2解答~#1#3}
+
+% 引用上标设置
+\let\citeoriginal\cite
+\RenewDocumentCommand{\cite}{m}
+    {\textsuperscript{\citeoriginal{#1}}}
+% #endregion
