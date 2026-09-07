@@ -1,0 +1,30 @@
+% @order: 2
+% @description: 设置数模论文标题样式
+
+% !论文标题设置
+% #region
+\newlength{\TitleTopSkip}\setlength{\TitleTopSkip}{0cm}
+\newlength{\TitleBetweenSkip}\setlength{\TitleBetweenSkip}{0.5em}
+\newlength{\TitleBottomSkip}\setlength{\TitleBottomSkip}{1.5\baselineskip}
+\newcommand{\MainTitle}{}
+\newcommand{\SubTitle}{}
+\makeatletter
+\define@key{mkt}{MainTitle}{\def\MainTitle{#1}}
+\define@key{mkt}{SubTitle}{\def\SubTitle{#1}}
+\renewcommand{\maketitle}[1][]{
+    \def\SubTitle{} % 每次调用清空副标题
+    \setkeys{mkt}{#1} % 解析参数
+    \vspace*{\TitleTopSkip}
+    % 主标题居中(改字号在这里)
+    \noindent\makebox[\textwidth][c]{\Huge \bfseries \MainTitle}\par
+    % 副标题
+    \ifx\SubTitle\@empty
+        % 无副标题则跳过
+    \else
+        \vspace{\TitleBetweenSkip}
+        \noindent\makebox[\textwidth][c]{\LARGE \bfseries ——\SubTitle}\par
+    \fi
+    \vspace{\TitleBottomSkip}
+}
+\makeatother
+% #endregion

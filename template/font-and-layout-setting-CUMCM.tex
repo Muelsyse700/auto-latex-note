@@ -1,0 +1,106 @@
+% @order: 1
+% @description: 设置全局字体、页面布局(数模论文专用)
+
+% !字体和版式设置
+% #region
+
+% 页面布局
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+}
+
+% 中文字体设置
+%\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Sans SC Medium},
+    ItalicFont={Kaiti SC}
+]
+\setCJKsansfont{Source Han Sans SC}[
+    BoldFont={Source Han Sans SC Bold}
+]
+\newCJKfontfamily\heavyfont{Source Han Serif SC Heavy}
+\setCJKmonofont{PingFang SC}
+
+% 数学字体设置
+\setmathfont{latinmodern-math.otf}
+\setmathfont[
+    range={"2205},
+    Scale=MatchUppercase
+]{STIX Two Math}
+\sisetup{
+    per-mode = reciprocal,
+    inter-unit-product = \ensuremath{\cdot}
+}
+
+% 文档分页与数学排版
+\let\cleardoublepage\clearpage
+\allowdisplaybreaks
+
+% 页面垂直对齐
+\raggedbottom
+
+\ctexset{ % 设置一级标题格式
+	section={
+		format={\centering\Large\textbf},
+		number = \chinese{section},
+		}
+	}
+
+% 表格列样式设置
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{L}{>{\hbadness=10000\relax}X}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
+\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
+
+% abstract环境设置
+\usepackage{abstract}% 摘要
+\ctexset{abstractname={}} % 取消默认摘要标题
+\newcommand{\keywordscontent}{} 
+\newcommand{\keywords}[1]{
+    \def\keywordscontent{#1}
+}
+\renewenvironment{abstract}{
+    \par
+    \noindent\begin{center}{\Large\bfseries 摘\hspace{2em}要}\end{center}\par % 摘要标题
+    \def\keywordscontent{} % 清空关键词
+}{
+    \par
+    \ifx\keywordscontent\empty
+    \else % 输出关键词
+        \vspace{0.8em}
+        {\noindent\bfseries 关键词：} \textit{\keywordscontent}\par
+    \fi
+}
+
+% 符号说明表格样式设置
+\newenvironment{symboltable}[1]{
+    \begin{xltabular}{\textwidth}{
+        @{} >{\hsize=0.2\hsize}Z >{\hsize=0.6\hsize}Z >{\hsize=0.2\hsize}Z @{}
+    }
+    \caption{符号说明及其单位} \label{tab:dataName} \\
+    \toprule[0.08em]
+    \textbf{符号} & \textbf{说明} & \textbf{单位} \\
+    \midrule[0.05em]
+    \endfirsthead % 第一页表头
+    
+    \multicolumn{3}{c}{表\thetable \quad 符号含义及其单位（续）} \\ 
+    \toprule[0.08em]
+    \textbf{符号} & \textbf{说明} & \textbf{单位} \\
+    \midrule[0.05em]
+    \endhead % 后续页表头
+    
+    \midrule[0.05em]
+    \multicolumn{3}{r@{}}{（接下表）} \\
+    \endfoot % 非尾页的页脚
+    
+    \bottomrule[0.08em]
+    \endlastfoot % 最后一页底部
+    
+    #1 % 插入表格数据内容
+    
+    \end{xltabular}
+}
+% #endregion

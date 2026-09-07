@@ -1,5 +1,5 @@
 % @order: 1
-% @description: 全局字体、页面布局、章节标题、数学字体以及基础排版样式设置
+% @description: 设置全局字体、页面布局
 
 % !字体和版式设置
 % #region
@@ -21,7 +21,6 @@
 \setCJKsansfont{Source Han Sans SC}[
     BoldFont={Source Han Sans SC Bold}
 ]
-\newCJKfontfamily\fangsong{FangSong}
 \newCJKfontfamily\heavyfont{Source Han Serif SC Heavy}
 \setCJKmonofont{PingFang SC}
 
@@ -48,6 +47,10 @@
     chapter/beforeskip=0pt,
     chapter/afterskip=0pt,
 }
+
+% 标题与目录设置
+\usepackage[explicit]{titlesec}
+\usepackage{titletoc}
 
 % Chapter样式
 \titleformat{\chapter}[display]
@@ -105,8 +108,49 @@
     inter-unit-product = \ensuremath{\cdot}
 }
 
-% 表格格式
+% 设置目录
+% 目录标题样式
+\titleformat{name={\chapter},numberless}[block]
+    {\Huge\heavyfont}
+    {}
+    {0pt}
+    {#1}
+
+
+% 目录条目样式
+\titlecontents{chapter}
+    [0pt]
+    {\addvspace{1em}\bfseries}
+    {Chapter~\thecontentslabel\hspace{1em}}
+    {}
+    {\hfill\contentspage}
+
+
+% 生成目录
+\newcommand{\makecontents}{
+    \let\oldcleardoublepage\cleardoublepage
+    \let\cleardoublepage\clearpage
+
+    \frontmatter
+
+    \pagestyle{plain}
+
+    \begingroup
+        \ctexset{
+            contentsname = {目~录}
+        }
+        \tableofcontents
+    \endgroup
+
+    \mainmatter
+
+    \let\cleardoublepage\oldcleardoublepage
+}
+
+% 表格列样式设置
 \renewcommand{\tabularxcolumn}[1]{m{#1}}
 \newcolumntype{L}{>{\hbadness=10000\relax}X}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
+\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
 
 % #endregion

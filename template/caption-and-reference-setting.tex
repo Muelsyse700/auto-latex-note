@@ -1,9 +1,8 @@
 % @order: 6
-% @description: 设置图表标题格式、表格列样式以及 cleveref 交叉引用显示格式
+% @description: 设置图表标题格式、交叉引用格式
 
 % !图表标题与引用设置
 % #region
-\DeclareCaptionFont{fangsong}{\fangsong} % 使用ctex的仿宋命令
 \captionsetup[table]{
 	skip = 0pt,
     labelsep = quad
@@ -13,10 +12,6 @@
 	justification = centering,
     skip = 0pt
 }
-
-% 表格列样式设置
-\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
-\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
 
 % 参数含义 1、单数名称；2、复数名称
 \captionsetup[subfigure]{labelformat=simple}

@@ -6,10 +6,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE_DIR="$SCRIPT_DIR/../template"
 
 RESET='\033[0m'
+BOLD='\033[1m'
 RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
+PURPLE='\033[35m'   # 保留，可能与后续扩展一致
 
 usage() {
     printf '%b\n' "${CYAN}用法:${RESET} $(basename "$0") [选项] [目标目录]"
@@ -83,7 +85,7 @@ set -e
 # -------------------- 更新模式 --------------------
 if [ "$UPDATE_MODE" = true ]; then
     printf '%b\n' "${CYAN}=== latexNote 更新模式 ===${RESET}"
-    printf '目标目录：%s\n\n' "$TARGET_DIR_ABS"
+    printf '目标目录：%b\n\n' "${YELLOW}${TARGET_DIR_ABS}${RESET}"
 
     # 确保必要的子目录存在
     mkdir -p "$TARGET_DIR/setting" "$TARGET_DIR/.vscode"
@@ -111,10 +113,17 @@ if [ "$UPDATE_MODE" = true ]; then
     cp "$TEMPLATE_DIR/note.gitignore" "$TARGET_DIR/.gitignore"
     printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}.gitignore${RESET}"
 
-    # 重新生成 latexNote.sty
-    printf '%b\n' "${CYAN}正在重新生成 setting/core-setting.tex ...${RESET}"
+    # 重新生成 core-setting.tex（make-core.sh 现生成到目标根目录）
+    printf '%b\n' "${CYAN}正在重新生成 core-setting.tex ...${RESET}"
     "$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
-    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/core-setting.tex${RESET}"
+    # 将生成的 core-setting.tex 移动到 setting/ 子目录
+    if [ -f "$TARGET_DIR/core-setting.tex" ]; then
+        mv "$TARGET_DIR/core-setting.tex" "$TARGET_DIR/setting/core-setting.tex"
+        printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/core-setting.tex${RESET}"
+    else
+        printf '%b\n' "${RED}错误：生成 core-setting.tex 失败${RESET}"
+        exit 1
+    fi
 
     printf '\n'
     printf '%b\n' "${CYAN}=== auto-latex-note 更新完成 ===${RESET}"
@@ -124,7 +133,7 @@ fi
 
 # -------------------- 初始化模式 --------------------
 printf '%b\n' "${CYAN}=== latexNote 初始化 ===${RESET}"
-printf '目标目录：%s\n\n' "$TARGET_DIR_ABS"
+printf '目标目录：%b\n\n' "${CYAN}${TARGET_DIR_ABS}${RESET}"
 
 if ! command -v git >/dev/null 2>&1; then
     printf '%b\n' "${RED}错误：未找到 Git，请先安装 Git。${RESET}"
@@ -144,7 +153,15 @@ printf '%b\n' "${GREEN}✓ 已创建目录结构${RESET}"
 
 "$SCRIPT_DIR/make-main-note.sh" "$TARGET_DIR"
 
+# 生成 core-setting.tex 到目标根目录，然后移动到 setting/
 "$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
+if [ -f "$TARGET_DIR/core-setting.tex" ]; then
+    mv "$TARGET_DIR/core-setting.tex" "$TARGET_DIR/setting/core-setting.tex"
+    printf '%b\n' "${GREEN}✓ 已生成 ${YELLOW}setting/core-setting.tex${RESET}"
+else
+    printf '%b\n' "${RED}错误：生成 core-setting.tex 失败${RESET}"
+    exit 1
+fi
 
 if [ ! -f "$TEMPLATE_DIR/cover.pdf" ]; then
     printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/cover.pdf${RESET}"
