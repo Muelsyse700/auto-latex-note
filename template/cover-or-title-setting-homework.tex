@@ -1,0 +1,60 @@
+% @order: 2
+% @description: 设置作业标题样式
+
+% !论文标题设置
+% #region
+\usepackage[style=iso]{datetime2} % 日期
+\makeatletter
+% 作业信息接口
+\newcommand{\coursename}[1]{\def\@coursename{#1}}
+\newcommand{\week}[1]{\def\@week{#1}}
+\newcommand{\studentname}[1]{\def\@studentname{#1}}
+\newcommand{\studentid}[1]{\def\@studentid{#1}}
+\newcommand{\schoollogo}[1]{\def\@schoollogo{#1}}
+
+% 默认作业信息
+\def\@coursename{课程名称}
+\def\@week{1}
+\def\@studentname{姓名}
+\def\@studentid{学号}
+\def\@schoolloge{setting/logo.emf}
+% 作业标题
+\renewcommand{\maketitle}{
+    % 标题区域
+    \noindent
+    \begin{minipage}[c]{0.78\textwidth}
+        {
+            {\Huge\heavyfont\@coursename}\quad
+            \textbf{\large 第\@week 周作业}
+        }\par
+
+        \vspace{1em}
+
+        % 第二行：姓名 学号
+        {
+            {\large\textit{\@studentname}}\qquad
+            {\large\texttt{\@studentid}}
+        }\par
+    \end{minipage}
+    \hfill
+    \ifx\@schoollogo\@empty
+    \else
+        \begin{minipage}[c]{0.16\textwidth}
+            \centering
+            \includegraphics[
+                width=\linewidth,
+                height=2cm,
+                keepaspectratio
+            ]{\@schoollogo}
+        \end{minipage}
+    \fi
+    \par
+    \vspace{1em}
+
+    % 长横线
+    \noindent\rule{\textwidth}{0.5pt}\par
+
+    \vspace{0.5em}
+    \thispagestyle{empty}
+}
+% #endregion

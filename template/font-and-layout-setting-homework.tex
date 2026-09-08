@@ -1,0 +1,53 @@
+% @order: 1
+% @description: 设置全局字体、页面布局(作业专用)
+
+% !字体和版式设置
+% #region
+
+% 页面布局
+\geometry{
+    left=1cm,
+    right=1cm,
+    top=1.2cm,
+    bottom=1cm,
+    headheight=18pt,
+    headsep=8pt,
+    footskip=5pt
+}
+
+% 中文字体设置
+%\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Sans SC Medium},
+    ItalicFont={Kaiti SC}
+]
+\setCJKsansfont{Source Han Sans SC}[
+    BoldFont={Source Han Sans SC Bold}
+]
+\newCJKfontfamily\heavyfont{Source Han Serif SC Heavy}
+\setCJKmonofont{PingFang SC}
+
+% 数学字体设置
+\setmathfont{latinmodern-math.otf}
+\setmathfont[
+    range={"2205},
+    Scale=MatchUppercase
+]{STIX Two Math}
+\sisetup{
+    per-mode = reciprocal,
+    inter-unit-product = \ensuremath{\cdot}
+}
+
+% 文档分页与数学排版
+\let\cleardoublepage\clearpage
+\allowdisplaybreaks
+
+% 页面垂直对齐
+\raggedbottom
+
+% 表格列样式设置
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\newcolumntype{L}{>{\hbadness=10000\relax}X}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X} % 左对齐可换行
+\newcolumntype{Z}{>{\centering\arraybackslash}X}   % 居中对齐
+% #endregion

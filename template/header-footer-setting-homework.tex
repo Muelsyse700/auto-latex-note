@@ -1,0 +1,30 @@
+% @order: 7
+% @description: 设置页面页眉页脚样式
+
+% !页眉页脚样式设置
+% #region
+\makeatletter
+
+\fancypagestyle{myheader}{
+    \fancyhf{}
+
+    \renewcommand{\headrulewidth}{1pt}
+
+    % 奇数页：姓名 | 课程-W周数 | 页码
+    \fancyhead[LO]{\@studentname}
+    \fancyhead[CO]{\@coursename-W\@week}
+    \fancyhead[RO]{\thepage}
+
+    % 偶数页：页码 | 课程-W周数 | 姓名
+    \fancyhead[LE]{\thepage}
+    \fancyhead[CE]{\@coursename-W\@week}
+    \fancyhead[RE]{\@studentname}
+}
+
+\makeatother
+
+\pagestyle{myheader}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% #endregion
