@@ -41,6 +41,36 @@
     itemindent=*
 }
 
+\SetEnumitemKey{par}{
+    label=\bfseries(\arabic*),
+    ref=\arabic*,
+    itemsep=0pt,
+    parsep=0pt,
+    leftmargin=*
+}
+
+\SetEnumitemKey{pari}{
+    label=\raisebox{0.175em}{\footnotesize\bfseries(\arabic*)},
+    ref=\arabic*,
+    itemjoin=\quad,
+    itemjoin*=\quad
+}
+
+\SetEnumitemKey{dot}{
+    label={\bfseries\arabic*.},
+    ref=\arabic*,
+    itemsep=0pt,
+    parsep=0pt,
+    leftmargin=*
+}
+
+\SetEnumitemKey{doti}{
+    label=\raisebox{0.075em}{\footnotesize\bfseries\arabic*.},
+    ref=\arabic*,
+    itemjoin=\quad,
+    itemjoin*=\quad
+}
+
 % 无序列表全局样式
 \setlist[itemize,1]{
     label={\faCaretRight},

@@ -1,6 +1,8 @@
 % @order: 0
 % @description: 宏包依赖
 
+% !宏包依赖
+% #region
 % 基础工具
 \usepackage{keyval, etoolbox, xparse}
 
@@ -13,12 +15,13 @@
 \usepackage{mathtools}
 \usepackage{nicematrix}
 \usepackage{extarrows}
-\usepackage{stackengine}
+\usepackage{stackengine, bm}
 \usepackage{unicode-math, physics, esint, cases}
 \usepackage{siunitx}
 
 % 文本与列表
-\usepackage{enumitem, ragged2e}
+\usepackage[inline]{enumitem}
+\usepackage{ragged2e}
 
 % 绘图与图像
 \usepackage{tikz}
@@ -47,6 +50,10 @@
 % 警告控制
 \usepackage{silence}
 
+% @others
+
 % 超链接与引用(必须最后)
 \usepackage[colorlinks, linkcolor=black, anchorcolor=black, citecolor=black]{hyperref}
 \usepackage[capitalize, nameinlink, noabbrev]{cleveref}
+
+% #endregion

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @description: 将模板设置文件合并生成 core-setting.tex 文件
+# @description*: 将模板设置文件合并生成 core-setting.tex 文件
 
 RESET='\033[0m'
 BOLD='\033[1m'
@@ -26,7 +26,7 @@ usage() {
     exit 0
 }
 
-# 输出错误信息（人类模式彩色，机器模式无颜色且可能输出到stderr）
+# 输出错误信息
 error_exit() {
     local msg="$1"
     if [ $AUTO_MODE -eq 0 ]; then
@@ -52,7 +52,6 @@ else
     TARGET_DIR="${1:-.}"
 fi
 
-# 如果未设置目标目录（人类模式无参数时），已设置
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE="$SCRIPT_DIR/../template"
 
@@ -68,9 +67,34 @@ index=0
 
 for file in "$TEMPLATE"/*.tex; do
     [ -f "$file" ] || continue
-    order=$(grep -m1 '^% @order:' "$file" | sed 's/.*@order:[ ]*//')
-    [ -n "$order" ] || continue
-    desc=$(grep -m1 '^% @description:' "$file" | sed 's/.*@description:[ ]*//')
+
+    line1=""
+    line2=""
+    {
+        IFS= read -r line1 || line1=""
+        IFS= read -r line2 || line2=""
+    } < "$file"
+
+    case "$line1" in
+        "% @order:"*)
+            order="${line1#% @order:}"
+            order="${order#"${order%%[![:space:]]*}"}"   # 去掉前导空白
+            ;;
+        *)
+            continue
+            ;;
+    esac
+
+    case "$line2" in
+        "% @description:"*)
+            desc="${line2#% @description:}"
+            desc="${desc#"${desc%%[![:space:]]*}"}"
+            ;;
+        *)
+            desc=""
+            ;;
+    esac
+
     FILES[$index]="$file"
     ORDERS[$index]="$order"
     DESCRIPTIONS[$index]="$desc"
@@ -79,7 +103,7 @@ done
 
 [ "$index" -eq 0 ] && error_exit "未找到有效模块"
 
-# 按 order 排序（稳定）
+# 按 order 排序
 declare -a SORTED
 while read -r idx; do
     SORTED+=("$idx")
@@ -89,7 +113,7 @@ done < <(
     done | sort -n -k1 | awk '{print $2}'
 )
 
-# 计算最大文件名长度（用于人类模式对齐）
+# 计算最大文件名长度
 max_len=0
 for i in "${SORTED[@]}"; do
     name=$(basename "${FILES[$i]}")
@@ -98,7 +122,7 @@ for i in "${SORTED[@]}"; do
 done
 col_width=$((max_len + 2))
 
-# 打印模块信息（人类模式）
+# 打印模块信息
 print_module() {
     local num=$1
     local i=$2
@@ -186,38 +210,86 @@ resolve_required_conflicts_auto() {
     REQUIRED_SELECTED=("${SELECTED_REQUIRED[@]}")
 }
 
+# ---------- 生成最终文件 ----------
+generate_output() {
+    # 收集其它模块头部声明的 \usepackage
+    local -a EXTRA_PACKAGES=()
+    local i line content
+    for i in "${FINAL[@]}"; do
+        [ "${ORDERS[$i]}" -eq 0 ] && continue
+        while IFS= read -r line; do
+            case "$line" in
+                "% @"*)
+                    content="${line#% @}"
+                    case "$content" in
+                        "\\usepackage"*)
+                            EXTRA_PACKAGES+=("$content")
+                            ;;
+                    esac
+                    ;;
+                *)
+                    break
+                    ;;
+            esac
+        done < "${FILES[$i]}"
+    done
+
+    # 定位 order=0 的模块
+    local zero_idx=-1
+    for i in "${FINAL[@]}"; do
+        if [ "${ORDERS[$i]}" -eq 0 ]; then
+            zero_idx=$i
+            break
+        fi
+    done
+
+    {
+        printf "%% @description: 自动生成的LaTeX设置文件\n\n"
+        for i in "${FINAL[@]}"; do
+            printf "%% @name: %s\n" "$(basename "${FILES[$i]}")"
+            if [ "$i" -eq "$zero_idx" ] && [ "${#EXTRA_PACKAGES[@]}" -gt 0 ]; then
+                # 在 % @others 行后注入收集到的 \usepackage
+                while IFS= read -r line; do
+                    if [ "$line" = "% @others" ]; then
+                        printf "%s\n" "$line"
+                        printf "%s\n" "${EXTRA_PACKAGES[@]}"
+                    else
+                        printf "%s\n" "$line"
+                    fi
+                done < "${FILES[$i]}"
+            else
+                cat "${FILES[$i]}"
+            fi
+            printf "\n\n"
+        done
+    } > "$OUTPUT"
+}
+
 # ---------- 主体逻辑 ----------
 
 if [ $AUTO_MODE -eq 1 ]; then
     # 机器模式
     resolve_required_conflicts_auto
 
-    declare -a FINAL=()
+    declare -a PRE_FINAL=()
     for i in "${REQUIRED_SELECTED[@]}"; do
-        FINAL+=("$i")
+        PRE_FINAL+=("$i")
     done
     for i in "${SORTED[@]}"; do
         if [ "${ORDERS[$i]}" -ge 20 ] && [ "${ORDERS[$i]}" -lt 100 ]; then
-            FINAL+=("$i")
+            PRE_FINAL+=("$i")
         fi
     done
-    declare -a FINAL_SORTED
+    declare -a FINAL
     while read -r idx; do
-        FINAL_SORTED+=("$idx")
+        FINAL+=("$idx")
     done < <(
-        for i in "${FINAL[@]}"; do
+        for i in "${PRE_FINAL[@]}"; do
             printf '%s %s %s\n' "${ORDERS[$i]}" "$(basename "${FILES[$i]}")" "$i"
         done | sort -n -k1 -k2 | awk '{print $3}'
     )
 
-    {
-        printf "%% @description: 自动生成的LaTeX设置文件\n\n"
-        for i in "${FINAL_SORTED[@]}"; do
-            printf "%% @name: %s\n" "$(basename "${FILES[$i]}")"
-            cat "${FILES[$i]}"
-            printf "\n\n"
-        done
-    } > "$OUTPUT"
+    generate_output
 
     exit 0
 
@@ -457,14 +529,7 @@ else
     fi
 
     # 生成文件
-    {
-        printf "%% @description: 自动生成的LaTeX设置文件\n\n"
-        for i in "${FINAL[@]}"; do
-            printf "%% @name: %s\n" "$(basename "${FILES[$i]}")"
-            cat "${FILES[$i]}"
-            printf "\n\n"
-        done
-    } > "$OUTPUT"
+    generate_output
 
     printf "\n${GREEN}✓ 已生成${RESET} ${YELLOW}%s${RESET}\n" "$OUTPUT"
 fi

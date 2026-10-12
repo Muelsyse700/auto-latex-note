@@ -1,0 +1,58 @@
+% @order: 21
+% @description: 代码块样式
+% @\usepackage[framemethod=TikZ]{mdframed}
+
+% !代码块样式设置
+% #region
+
+% 配色
+\definecolor{keywordcolor}{RGB}{46,85,155}      % 蓝色关键字
+\definecolor{stringcolor}{RGB}{92,181,120}      % 绿色字符串
+\definecolor{commentcolor}{RGB}{131,167,168}    % 灰蓝色注释
+\definecolor{functioncolor}{RGB}{238,131,74}    % 黄色函数名
+\definecolor{bgcolor}{RGB}{248,248,248}         % 浅灰色背景
+\definecolor{textcolor}{RGB}{0,0,0}             % 黑色普通文字
+
+\lstdefinestyle{mypython}{
+    language=Python,
+    basicstyle=\ttfamily\small\color{textcolor},
+    keywordstyle=\color{functioncolor},             % 普通关键字
+    stringstyle=\color{stringcolor},
+    commentstyle=\color{commentcolor}\itshape,
+    numbers=left,
+    numberstyle=\ttfamily\small\color{textcolor},
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    breakatwhitespace=false,
+    tabsize=4,
+    inputencoding=utf8,
+    emph={self,def,class,import,from,return,if,elif,else,for,while,try,except,with,lambda,pass,break,continue,True,False,None,in,as,not},             % 特殊关键字
+    emphstyle=\color{keywordcolor}\itshape        % 斜体显示
+}
+
+\tcbuselibrary{breakable} % 引入 breakable 库
+\tcbuselibrary{skins} % 引入 skins 库
+\newcommand{\includecode}[4][]{
+    \begin{tcolorbox}[ % 代码块样式设置
+        breakable,
+        enforce breakable,
+        colback=bgcolor,
+        colframe=black,
+        fonttitle=\bfseries,
+        title={#2},
+        label={#3},
+        sharp corners,
+        coltitle=white,
+        boxrule=0.75pt,
+        left=2pt, right=2pt, top=2pt, bottom=2pt
+    ]
+    \IfFileExists{#4}{
+    \lstinputlisting[style=#1]{#4}
+    }{
+        \textcolor{red}{文件未找到：#4}
+    }
+    \end{tcolorbox}
+}
+% #endregion

@@ -5,10 +5,17 @@
 % #region
 
 % 数学命令
-\RenewDocumentCommand{\va}{m}{\overrightarrow{#1}}
+\renewcommand{\va}[1]{\overrightarrow{#1}}
+\renewcommand{\vb}[1]{\symbfit{#1}}
 \newcommand{\ee}{\mathrm{e}} % 正体自然常数e
 \newcommand{\ii}{\mathrm{i}} % 正体虚数i
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\let\grad\relax\DeclareMathOperator{\grad}{\symbf{grad}} % 散度
+\DeclareMathOperator{\rot}{\symbf{rot}} % 旋度
+
+% 圆弧符号
+\DeclareSymbolFont{ugmL}{OMX}{mdugm}{m}{n}
+\DeclareMathAccent{\wideparen}{\mathord}{ugmL}{"F3}
 
 % 文本装饰命令
 \newcommand{\overtext}[2]{
@@ -20,6 +27,8 @@
 \newcommand{\circnum}[1]{
     {\bfseries\itshape{#1}\,${}^\circ$}
 }
+
+\newcommand{\skipitem}[1][1]{\addtocounter{enumi}{#1}} % 跳过enumerate编号
 
 % 图形符号命令
 \newcommand{\dashedmid}{

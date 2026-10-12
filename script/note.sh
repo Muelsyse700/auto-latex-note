@@ -29,15 +29,20 @@ usage() {
     printf '  note.sh -h           显示帮助信息\n'
 }
 
+is_hidden() {
+    local file="$1"
+    grep -q -E '^[[:space:]]*(#[[:space:]]*)?@description\*' "$file" 2>/dev/null
+}
+
 get_description() {
     local file="$1"
     local line
 
-    line="$(grep -m 1 -E '^[[:space:]]*(#[[:space:]]*)?@description:' "$file" 2>/dev/null || true)"
+    line="$(grep -m 1 -E '^[[:space:]]*(#[[:space:]]*)?@description\*?:?' "$file" 2>/dev/null || true)"
 
     if [ -n "$line" ]; then
         printf '%s\n' "$line" |
-            sed -E 's/^[[:space:]]*(#[[:space:]]*)?@description:[[:space:]]*//'
+            sed -E 's/^[[:space:]]*(#[[:space:]]*)?@description\*?:?[[:space:]]*//'
     else
         printf '%s' "无描述"
     fi
@@ -81,6 +86,90 @@ wait_after_execution() {
     fi
 }
 
+show_hidden_menu() {
+    local input choice args index script name wait_choice
+
+    while true; do
+        printf '\033c'
+
+        printf '%b\n' "${CYAN}${BOLD}latexNote 隐藏脚本${RESET}"
+        printf '当前目录：%s\n' "$TARGET_DIR"
+        printf '\n'
+
+        printf '%b\n' "${MAGENTA}${BOLD}=== 隐藏脚本 ===${RESET}"
+
+        if [ "${#HIDDEN_SCRIPT_FILES[@]}" -eq 0 ]; then
+            printf '  暂无隐藏脚本\n'
+        else
+            for i in "${!HIDDEN_SCRIPT_FILES[@]}"; do
+                number=$((i + 1))
+
+                printf '%b' "${YELLOW}  ${number}${RESET}) "
+                printf '%b\n' "${GREEN}${HIDDEN_SCRIPT_NAMES[$i]}${RESET}"
+                printf '     %s\n' "${HIDDEN_SCRIPT_DESCRIPTIONS[$i]}"
+            done
+        fi
+
+        printf '\n'
+        printf '%b\n' "${YELLOW}  b${RESET}) 返回主菜单    ${YELLOW}q${RESET}) 退出"
+        printf '\n'
+
+        printf '%b' "${CYAN}请选择：${RESET}"
+        read -r input
+
+        if [ "$input" = "q" ] || [ "$input" = "Q" ]; then
+            printf '%b\n' "${GREEN}已退出${RESET}"
+            exit 0
+        fi
+
+        if [ "$input" = "b" ] || [ "$input" = "B" ]; then
+            return 0
+        fi
+
+        if [ -z "$input" ]; then
+            continue
+        fi
+
+        read -r choice args <<< "$input"
+
+        if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+            printf '%b\n' "${RED}无效的选项${RESET}"
+            sleep 1
+            continue
+        fi
+
+        index=$((choice - 1))
+
+        if [ "$index" -lt 0 ] || [ "$index" -ge "${#HIDDEN_SCRIPT_FILES[@]}" ]; then
+            printf '%b\n' "${RED}无效的选项${RESET}"
+            sleep 1
+            continue
+        fi
+
+        script="${HIDDEN_SCRIPT_FILES[$index]}"
+        name="${HIDDEN_SCRIPT_NAMES[$index]}"
+
+        printf '\n%b\n' "${CYAN}正在执行 ${GREEN}${name}${CYAN} ...${RESET}"
+
+        if [[ "$args" == "-h" || "$args" == "--help" ]]; then
+            run_script "$script" "$args"
+        else
+            run_script "$script" "$TARGET_DIR"
+        fi
+
+        printf '\n%b\n' "${GREEN}${name} 执行完成${RESET}"
+
+        printf '\n'
+        printf '%b' "${CYAN}按 Enter 返回隐藏脚本菜单，按 q 退出：${RESET}"
+        read -r wait_choice
+
+        if [ "$wait_choice" = "q" ] || [ "$wait_choice" = "Q" ]; then
+            printf '%b\n' "${GREEN}已退出${RESET}"
+            exit 0
+        fi
+    done
+}
+
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
     exit 0
@@ -95,6 +184,9 @@ fi
 declare -a SCRIPT_FILES
 declare -a SCRIPT_NAMES
 declare -a SCRIPT_DESCRIPTIONS
+declare -a HIDDEN_SCRIPT_FILES
+declare -a HIDDEN_SCRIPT_NAMES
+declare -a HIDDEN_SCRIPT_DESCRIPTIONS
 
 while IFS= read -r -d '' file; do
     name="$(basename "$file")"
@@ -103,9 +195,15 @@ while IFS= read -r -d '' file; do
 
     description="$(get_description "$file")"
 
-    SCRIPT_FILES+=("$file")
-    SCRIPT_NAMES+=("$name")
-    SCRIPT_DESCRIPTIONS+=("$description")
+    if is_hidden "$file"; then
+        HIDDEN_SCRIPT_FILES+=("$file")
+        HIDDEN_SCRIPT_NAMES+=("$name")
+        HIDDEN_SCRIPT_DESCRIPTIONS+=("$description")
+    else
+        SCRIPT_FILES+=("$file")
+        SCRIPT_NAMES+=("$name")
+        SCRIPT_DESCRIPTIONS+=("$description")
+    fi
 done < <(
     find "$SCRIPT_DIR" -maxdepth 1 -type f \
         \( -name "*.sh" -o -name "*.py" \) \
@@ -148,7 +246,7 @@ while true; do
     fi
 
     printf '\n'
-    printf '%b\n' "${YELLOW}  q${RESET}) 退出"
+    printf '%b\n' "${YELLOW}  *${RESET}) ${BLUE}显示隐藏脚本${RESET}    ${YELLOW}q${RESET}) 退出"
     printf '\n'
 
     printf '%b' "${CYAN}请选择：${RESET}"
@@ -160,6 +258,11 @@ while true; do
     fi
 
     if [ -z "$input" ]; then
+        continue
+    fi
+
+    if [ "$input" = "*" ]; then
+        show_hidden_menu
         continue
     fi
 

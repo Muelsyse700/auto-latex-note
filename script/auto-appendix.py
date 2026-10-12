@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# @description: 自动生成数学建模论文附录
+# @description*: 自动生成数学建模论文附录
 
 """
 AutoAppendix.py - 从工作目录自动生成论文附录的 CSV 清单和 LaTeX 代码

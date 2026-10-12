@@ -125,8 +125,8 @@ echo
 
 # 选择序号
 while true; do
-    printf "${CYAN}请输入序号：${RESET}"
-    read -r CHOICE
+    printf "${CYAN}请输入序号：\n${RESET}"
+    read -e -r CHOICE
     case "$CHOICE" in
         ''|*[!0-9]*)
             printf "${RED}请输入有效的数字序号${RESET}\n"
@@ -175,8 +175,8 @@ while IFS= read -r LINE <&4; do
                 printf "${GREEN}[AUTO]${RESET} order=%s -> %s\n" "$ORDER" "$CONFLICT_FILE"
                 printf '%s\n' "$CONFLICT_FILE" >&3
             else
-                printf "${YELLOW}请手动输入文件名：${RESET}"
-                read -r MANUAL_FILE
+                printf "${YELLOW}请手动输入文件名：\n${RESET}"
+                read -e -r MANUAL_FILE
                 printf '%s\n' "$MANUAL_FILE" >&3
             fi
             ;;
@@ -212,27 +212,54 @@ if [ -f "$MAIN_NOTE" ]; then
     COURSE_NAME=$(grep -E '^\\covertitle\{[^}]*\}' "$MAIN_NOTE" | head -1 | sed -E 's/^\\covertitle\{([^}]*)\}/\1/')
 fi
 if [ -z "$COURSE_NAME" ]; then
-    printf "${CYAN}未从 main-note.tex 中找到 \\covertitle，请输入课程名称：${RESET}"
-    read -r COURSE_NAME
+    printf "${CYAN}未从 main-note.tex 中找到 \\covertitle，请输入课程名称：\n${RESET}"
+    read -e -r COURSE_NAME
 fi
 
-# 周次
+# ===== 从 homework.tex 前5行读取 @week 和 @ps =====
 WEEK=""
-if [[ "$SELECTED_NAME" =~ week([0-9]+) ]]; then
-    WEEK="${BASH_REMATCH[1]}"
+PS_NOTE=""
+HOMEWORK_TEX="$SELECTED_DIR/homework.tex"
+if [ -f "$HOMEWORK_TEX" ]; then
+    HEAD_5=$(head -n 5 "$HOMEWORK_TEX" 2>/dev/null)
+    if [ -n "$HEAD_5" ]; then
+        # 提取 @week
+        WEEK_LINE=$(printf '%s\n' "$HEAD_5" | grep -E '^% @week[[:space:]]+[0-9]+' | head -n 1)
+        if [ -n "$WEEK_LINE" ]; then
+            WEEK=$(printf '%s\n' "$WEEK_LINE" | sed -E 's/^% @week[[:space:]]+([0-9]+).*/\1/')
+        fi
+        # 提取 @ps
+        PS_LINE=$(printf '%s\n' "$HEAD_5" | grep -E '^% @ps[[:space:]]+' | head -n 1)
+        if [ -n "$PS_LINE" ]; then
+            PS_NOTE=$(printf '%s\n' "$PS_LINE" | sed -E 's/^% @ps[[:space:]]+//')
+        fi
+    fi
+fi
+
+# 周次（若 homework.tex 中未指定，则沿用原有逻辑）
+if [ -z "$WEEK" ]; then
+    if [[ "$SELECTED_NAME" =~ week([0-9]+) ]]; then
+        WEEK="${BASH_REMATCH[1]}"
+    fi
 fi
 if [ -z "$WEEK" ]; then
-    printf "${CYAN}未从目录名中解析出周次，请输入周次(数字)：${RESET}"
-    read -r WEEK
+    printf "${CYAN}未从 homework.tex 或目录名中解析出周次，请输入周次(数字)：\n${RESET}"
+    read -e -r WEEK
 fi
 
 # 姓名与学号
-printf "${CYAN}请输入学生姓名：${RESET}"
-read -r STUDENT_NAME
-printf "${CYAN}请输入学号：${RESET}"
-read -r STUDENT_ID
+printf "${CYAN}请输入学生姓名：\n${RESET}"
+read -e -r STUDENT_NAME
+printf "${CYAN}请输入学号：\n${RESET}"
+read -e -r STUDENT_ID
 
 # 生成 make.tex
+PS_BLOCK=""
+if [ -n "$PS_NOTE" ]; then
+    PS_BLOCK="\\vspace{-1em}\\noindent{\\scriptsize\\textit{注：$PS_NOTE}}
+"
+fi
+
 cat > make.tex <<EOF
 \documentclass[a4paper,twoside,12pt,fontset=none,UTF8]{ctexart}
 \input{core-setting.tex}
@@ -244,7 +271,7 @@ cat > make.tex <<EOF
 \schoollogo{logo.pdf}
 \begin{document}
 \maketitle
-\input{homework.tex}
+${PS_BLOCK}\input{homework.tex}
 \end{document}
 EOF
 
@@ -264,15 +291,54 @@ printf "\n${CYAN}=== 正在编译 ===${RESET}\n"
 
 cd "$SELECTED_DIR" || exit 1
 
-for i in 1 2; do
-    printf "第 %d 次编译..." "$i"
+PDF_NAME="homework-week${WEEK}.pdf"
+
+# 用系统默认 PDF 阅读器打开
+open_pdf() {
+    local pdf="$1"
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$pdf" >/dev/null 2>&1 &
+    elif command -v open >/dev/null 2>&1; then
+        open "$pdf" >/dev/null 2>&1 &
+    elif command -v wslview >/dev/null 2>&1; then
+        wslview "$pdf" >/dev/null 2>&1 &
+    elif command -v cygstart >/dev/null 2>&1; then
+        cygstart "$pdf" >/dev/null 2>&1 &
+    else
+        printf "${YELLOW}未找到系统默认 PDF 打开命令，请手动打开：%s${RESET}\n" "$pdf"
+    fi
+}
+
+compile_once() {
+    local label="$1"
+    printf "%s..." "$label"
     if xelatex -interaction=nonstopmode make.tex > /dev/null 2>&1; then
         printf "${GREEN}完成${RESET}\n"
+        return 0
     else
         printf "${RED}失败${RESET}\n"
         printf "${RED}错误：${RESET}xelatex 编译失败\n"
-        exit 1
+        return 1
     fi
+}
+
+# 收尾：重命名最终 PDF 并清理辅助文件
+finalize_output() {
+    if [ ! -f "make.pdf" ]; then
+        printf "${RED}错误：${RESET}未找到 make.pdf\n"
+        return 1
+    fi
+
+    mv -f "make.pdf" "$PDF_NAME"
+    rm -f make.tex make.aux make.log make.out core-setting.tex logo.pdf
+
+    printf "\n${GREEN}✓${RESET} PDF 已生成 ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/$PDF_NAME"
+    return 0
+}
+
+# 初始编译两次
+for i in 1 2; do
+    compile_once "第 ${i} 次编译" || exit 1
 done
 
 if [ ! -f "make.pdf" ]; then
@@ -280,10 +346,51 @@ if [ ! -f "make.pdf" ]; then
     exit 1
 fi
 
-PDF_NAME="homework-week${WEEK}.pdf"
-mv "make.pdf" "$PDF_NAME"
-rm -f make.tex make.aux make.log make.out core-setting.tex logo.pdf
+while true; do
+    printf "\n${CYAN}请选择下一步操作：${RESET}\n"
+    printf "${PURPLE}[1]${RESET} 查看编译结果\n"
+    printf "${PURPLE}[2]${RESET} 再编译一次\n"
+    printf "${PURPLE}[3]${RESET} 打印\n"
+    printf "${PURPLE}[q]${RESET} 退出\n"
+    printf "${CYAN}请输入序号 [1/2/3/q]：${RESET}"
 
-printf "\n${GREEN}✓ PDF 已生成：${RESET}${YELLOW}%s${RESET}\n" "$SELECTED_DIR/$PDF_NAME"
+    read -e -r ACTION
 
-exit 0
+    case "$ACTION" in
+        1)
+            if [ ! -f "make.pdf" ]; then
+                printf "${RED}错误：${RESET}未找到 make.pdf\n"
+                continue
+            fi
+            open_pdf "$SELECTED_DIR/make.pdf"
+            ;;
+        2)
+            compile_once "再编译一次" || exit 1
+            ;;
+        3)
+            finalize_output || exit 1
+
+            AUTO_PRINT="$SCRIPT_DIR/auto-print.sh"
+            if [ ! -f "$AUTO_PRINT" ]; then
+                printf "${RED}错误：${RESET}找不到 auto-print.sh：%s\n" "$AUTO_PRINT"
+                exit 1
+            fi
+
+            printf "${CYAN}正在调用打印脚本...${RESET}\n"
+            if [ -x "$AUTO_PRINT" ]; then
+                "$AUTO_PRINT" "$SELECTED_DIR" "$PDF_NAME"
+            else
+                zsh "$AUTO_PRINT" "$SELECTED_DIR" "$PDF_NAME"
+            fi
+            exit 0
+            ;;
+        q|Q)
+            finalize_output || exit 1
+            printf "${YELLOW}已退出${RESET}\n"
+            exit 0
+            ;;
+        *)
+            printf "${RED}请输入 1、2、3 或 q${RESET}\n"
+            ;;
+    esac
+done

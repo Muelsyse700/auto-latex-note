@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @description: 向用户请求信息生成main-note.tex文件
+# @description*: 向用户请求信息生成main-note.tex文件
 
 RESET=$'\033[0m'
 RED=$'\033[31m'

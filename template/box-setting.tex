@@ -93,7 +93,7 @@
 
 % 定义“引理”环境
 \newcounter{lemma}[theorem]
-\renewcommand{\thelemma}{\thesection-\arabic{theorem}(\arabic{lemma})}
+\renewcommand{\thelemma}{\thesection-(\arabic{lemma})}
 \newtcolorbox{lemma}[1][]{
     myThemStyle,
     colback=BlueLight,   % 背景色
@@ -178,49 +178,55 @@
 % 定义“问题”与“解答(证明)”环境
 \newcounter{question}[subsection]
 \renewcommand{\thequestion}{\arabic{question}}
-\newtcolorbox{question}[1][]{
+\NewTColorBox{question}{o}
+{
     myThemStyle,
-    colback=GrayLight,   % 背景色
-    colframe=GrayDeep,   % 边框色
+    colback=GrayLight,
+    colframe=GrayDeep,
     before upper={
-        \refstepcounter{question}
-        \textcolor{GrayDeep}{\textbf{问题~\thequestion}}~
+        \IfValueTF{#1}
+        {
+            \textcolor{GrayDeep}{\textbf{问题~#1}}~
+        }
+        {
+            \refstepcounter{question}
+            \textcolor{GrayDeep}{\textbf{问题~\thequestion}}~
+        }
     },
     overlay unbroken and last={
         \node[anchor=south east, inner sep=6pt] 
             at (frame.south east) {\color{GrayDeep}\faQuestion};
     },
-    #1
 }
-\newtcolorbox{solution}[1][]{
-    myTitleStyle,               % 调用通用标题栏样式
-    colback=GreenLight,         % 内容背景色
-    colframe=GreenDeep,         % 边框颜色
-    colbacktitle=GreenDeep,     % 标题栏背景色
-    title={解答}, % 自动编号标题 (关联问题的编号)
+\NewTColorBox{solution}{o}
+{
+    myTitleStyle,
+    colback=GreenLight,
+    colframe=GreenDeep,
+    colbacktitle=GreenDeep,
+    title={\IfValueTF{#1}{#1\enspace 解答}{解答}},
     after title={\hfill \faAngleDown},
     overlay unbroken and last={
         \node[anchor=south east, inner sep=6pt] 
             at (frame.south east) {\color{GreenDeep}\faCheckDouble};
     },
-    #1                          % 允许传入额外参数
 }
 % 定义“证明”环境
 \makeatletter
 \@ifundefined{proof}{}{\let\proof\relax \let\endproof\relax}
 \makeatother
-\newtcolorbox{proof}[1][]{
-    myTitleStyle,               % 调用通用标题栏样式
-    colback=GreenLight,         % 内容背景色
-    colframe=GreenDeep,         % 边框颜色
-    colbacktitle=GreenDeep,     % 标题栏背景色
-    title={证明}, % 自动编号标题 (关联问题的编号)
+\NewTColorBox{proof}{o}
+{
+    myTitleStyle,
+    colback=GreenLight,
+    colframe=GreenDeep,
+    colbacktitle=GreenDeep,
+    title={\IfValueTF{#1}{#1\enspace 证明}{证明}},
     after title={\hfill \faAngleDown},
     overlay unbroken and last={
         \node[anchor=south east, inner sep=6pt] 
             at (frame.south east) {\color{GreenDeep}\faSquare[regular]};
     },
-    #1                          % 允许传入额外参数
 }
 
 \newtcolorbox{extension}[2][]{

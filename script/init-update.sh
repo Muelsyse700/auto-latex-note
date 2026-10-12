@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @description: 初始化或更新 latexNote 笔记目录
+# @description*: 初始化或更新 latexNote 笔记目录
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE_DIR="$SCRIPT_DIR/../template"

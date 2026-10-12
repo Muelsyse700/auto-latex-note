@@ -333,4 +333,7 @@ TSWLatexianTemp*
 # 忽略 reference 目录及其内部的所有文件
 reference/
 
+# 忽略 homework 目录下的所有 pdf 文件
+homework/**/*.pdf
+
 .DS_Store
