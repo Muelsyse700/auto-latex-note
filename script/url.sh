@@ -3,11 +3,14 @@
 # @description: 将 URL 转义为 LaTeX 安全格式并复制到剪贴板
 
 RESET='\033[0m'
+RED='\033[31m'
 GREEN='\033[32m'
+YELLOW='\033[33m'
 CYAN='\033[36m'
+PURPLE='\033[35m'
 
 usage() {
-    printf '%b\n' "${CYAN}用法:${RESET} $(basename "$0") [选项]"
+    printf '%b\n' "${CYAN}用法:${RESET} ${YELLOW}$(basename "$0")${RESET} [选项]"
     printf '%b\n' "将用户输入的 URL 转义为 LaTeX 安全格式，并复制到剪贴板。"
     printf '\n'
     printf '%b\n' "${CYAN}选项:${RESET}"
@@ -28,13 +31,28 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 # 忽略其它所有参数（如果有），继续执行正常流程
 
-read -r -p "URL: " url
+# 注意：read -p 不解释 \033 转义，故用 printf '%b' 输出提示（保持提示走 stderr）
+printf '%b' "${CYAN}URL: ${RESET}" >&2
+read -r url
 
-escaped=$(printf '%s' "$url" | sed \
-    -e 's/\\/\\textbackslash{}/g' \
-    -e 's/\([#$%&_{}]\)/\\\1/g' \
-    -e 's/~/\\textasciitilde{}/g' \
-    -e 's/\^/\\textasciicircum{}/g')
+# 逐字符单次转义：每个原字符只映射一次，已插入的宏不会被后续规则二次处理
+# （原先用 sed 逐条替换时，\textbackslash{} 的大括号会被后面的转义规则变成 \{\}）
+escape_latex_url() {
+    local s="$1" out="" ch i
+    for (( i = 0; i < ${#s}; i++ )); do
+        ch="${s:i:1}"
+        case "$ch" in
+            '\') out+='\textbackslash{}' ;;
+            '~') out+='\textasciitilde{}' ;;
+            '^') out+='\textasciicircum{}' ;;
+            '#'|'$'|'%'|'&'|'_'|'{'|'}') out+="\\${ch}" ;;
+            *)   out+="${ch}" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+
+escaped="$(escape_latex_url "$url")"
 
 printf '%s' "$escaped" | pbcopy
 

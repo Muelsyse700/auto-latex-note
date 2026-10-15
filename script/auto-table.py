@@ -36,18 +36,18 @@ def print_help():
 
 {CYAN}表格转换功能使用步骤:{RESET}
 
-  {GREEN}插入新表格:{RESET}
+  {PURPLE}插入新表格:{RESET}
     1. 将 UTF-8 编码的逗号分隔 CSV 文件放入 Input 文件夹（一次一个）。
     2. 运行 auto-table.py(可指定项目根目录)。
     3. 在终端复制插入代码至正文中。
     4. 完成表格插入。
 
-  {GREEN}更新表格数据:{RESET}
+  {PURPLE}更新表格数据:{RESET}
     1. 将更新后的 CSV 重新放入 Input 文件夹（不必删除原来的，不要改动 CSV 的文件名）。
     2. 运行 auto-table.py。
     3. 更新完成（同名表格会被覆盖）。
 
-  {GREEN}查找插入和引用代码:{RESET}
+  {PURPLE}查找插入和引用代码:{RESET}
     1. 打开 table-index.txt。
     2. 根据语句后注释的提示寻找你需要的语句。
 
@@ -73,7 +73,7 @@ def parse_args():
         return None, True
     # 取第一个参数作为目标目录
     if len(args) > 1:
-        print(f"{RED}警告:{RESET} 多余参数将被忽略，只使用第一个参数作为目标目录。")
+        print(f"{YELLOW}警告:{RESET} 多余参数将被忽略，只使用第一个参数作为目标目录。")
     target = args[0]
     return target, False
 
@@ -135,14 +135,14 @@ def main():
     else:
         base_dir = os.path.abspath(target_dir)
         if not os.path.isdir(base_dir):
-            print(f"{RED}错误:{RESET} 目录 '{base_dir}' 不存在。")
+            print(f"{RED}错误:{RESET} 目录 '{YELLOW}{base_dir}{RESET}' 不存在。")
             sys.exit(1)
 
     # 检查 table 子目录
     table_dir = os.path.join(base_dir, "table")
     if not os.path.isdir(table_dir):
-        print(f"{RED}错误:{RESET} 在 '{base_dir}' 下未找到 table/ 子目录。")
-        print(f"{YELLOW}提示:{RESET} 请确保目录结构正确（包含 table/Input/, table/Output/, table/table-index.txt）。")
+        print(f"{RED}错误:{RESET} 在 '{YELLOW}{base_dir}{RESET}' 下未找到 {YELLOW}table/{RESET} 子目录。")
+        print(f"{YELLOW}提示:{RESET} 请确保目录结构正确（包含 {YELLOW}table/Input/{RESET}, {YELLOW}table/Output/{RESET}, {YELLOW}table/table-index.txt{RESET}）。")
         sys.exit(1)
 
     input_dir = os.path.join(table_dir, "Input")
@@ -156,10 +156,10 @@ def main():
     # ---------- 寻找唯一 CSV ----------
     csv_files = [f for f in os.listdir(input_dir) if f.endswith(".csv")]
     if len(csv_files) == 0:
-        print(f"{RED}错误:{RESET} Input 文件夹中没有 CSV 文件。")
+        print(f"{RED}错误:{RESET} {YELLOW}Input{RESET} 文件夹中没有 CSV 文件。")
         sys.exit(1)
     if len(csv_files) > 1:
-        print(f"{RED}错误:{RESET} Input 文件夹中必须只有一个 CSV 文件，当前有 {len(csv_files)} 个。")
+        print(f"{RED}错误:{RESET} {YELLOW}Input{RESET} 文件夹中必须只有一个 CSV 文件，当前有 {len(csv_files)} 个。")
         sys.exit(1)
 
     csv_file = csv_files[0]
@@ -256,11 +256,11 @@ def main():
         with open(index_file, "a", encoding="utf-8") as f:
             f.write(input_line + "\n")
             f.write(ref_line + "\n\n")
-        print(f"{GREEN}✓ 已生成 LaTeX 表格：{YELLOW}{output_tex_path}{RESET}")
-        print(f"{GREEN}✓ 已更新索引文件：{YELLOW}{index_file}{RESET}")
+        print(f"{GREEN}✓{RESET} 已生成 LaTeX 表格：{YELLOW}{output_tex_path}{RESET}")
+        print(f"{GREEN}✓{RESET} 已更新索引文件：{YELLOW}{index_file}{RESET}")
     else:
-        print(f"{GREEN}✓ 已覆盖同名表格，已更新对应的 LaTeX 表格：{YELLOW}{output_tex_path}{RESET}")
-        print(f"{GREEN}✓ 索引文件无需更改：{YELLOW}{index_file}{RESET}")
+        print(f"{GREEN}✓{RESET} 已覆盖同名表格，已更新对应的 LaTeX 表格：{YELLOW}{output_tex_path}{RESET}")
+        print(f"{GREEN}✓{RESET} 索引文件无需更改：{YELLOW}{index_file}{RESET}")
 
     # ---------- 输出提示 ----------
     print(f"{CYAN}[label] tab:{label_name}{RESET}")

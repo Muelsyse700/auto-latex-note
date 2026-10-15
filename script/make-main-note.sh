@@ -7,10 +7,11 @@ RED=$'\033[31m'
 GREEN=$'\033[32m'
 YELLOW=$'\033[33m'
 CYAN=$'\033[36m'
+PURPLE=$'\033[35m'
 
 # 帮助信息
 usage() {
-    printf '%b\n' "${CYAN}用法:${RESET} $0 [目标目录]"
+    printf '%b\n' "${CYAN}用法:${RESET} ${YELLOW}$0${RESET} [目标目录]"
     printf '%b\n' ""
     printf '%b\n' "从模板生成主笔记文件 ${YELLOW}main-note.tex${RESET}。"
     printf '%b\n' "如果指定目标目录，则生成到该目录下；否则生成到当前工作目录。"
@@ -31,7 +32,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE="$SCRIPT_DIR/../template/main-note.tex"
 
 mkdir -p "$TARGET_DIR" || {
-    printf "${RED}错误：无法创建目录 $TARGET_DIR${RESET}\n" >&2
+    printf "${RED}错误：${RESET}无法创建目录 ${YELLOW}$TARGET_DIR${RESET}\n" >&2
     exit 1
 }
 
@@ -39,7 +40,7 @@ TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 OUTPUT="$TARGET_DIR/main-note.tex"
 
 if [ ! -f "$TEMPLATE" ]; then
-    printf "${RED}错误：找不到模板文件：$TEMPLATE${RESET}\n" >&2
+    printf "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE${RESET}\n" >&2
     exit 1
 fi
 
@@ -86,7 +87,7 @@ if [ -z "$DATE" ]; then
 fi
 
 echo
-printf "${CYAN}=== 输入 main-note.tex 文件基本信息 ===${RESET}\n"
+printf "${PURPLE}=== 输入 main-note.tex 文件基本信息 ===${RESET}\n"
 echo
 
 TITLE="$(ask_value "笔记标题" "$TITLE")"
@@ -140,4 +141,4 @@ awk \
     }
 ' "$TEMPLATE" > "$OUTPUT"
 
-printf "${GREEN}✓ 已生成 ${YELLOW}%s${RESET}\n" "$OUTPUT"
+printf "${GREEN}✓${RESET} 已生成 ${YELLOW}%s${RESET}\n" "$OUTPUT"

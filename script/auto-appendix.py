@@ -76,7 +76,7 @@ def parse_args():
             return None, True, False
     # 普通工作目录
     if len(args) > 1:
-        print(f"{RED}警告:{RESET} 多余参数将被忽略，只使用第一个参数作为目标目录。")
+        print(f"{YELLOW}警告:{RESET} 多余参数将被忽略，只使用第一个参数作为目标目录。")
     return args[0], False, False
 
 # ---------- 初始化环境 ----------
@@ -96,15 +96,15 @@ def init_environment(base_dir):
         with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["序号", "文件名", "用途"])
-        print(f"{GREEN}✓ 创建了 {csv_path}{RESET}")
+        print(f"{GREEN}✓{RESET} 创建了 {YELLOW}{csv_path}{RESET}")
 
     tex_path = os.path.join(appendix_dir, "appendix.tex")
     if not os.path.exists(tex_path):
         with open(tex_path, "w", encoding="utf-8") as f:
             f.write("")
-        print(f"{GREEN}✓ 创建了 {tex_path}{RESET}")
+        print(f"{GREEN}✓{RESET} 创建了 {YELLOW}{tex_path}{RESET}")
 
-    print(f"{GREEN}✅ 附录目录初始化完成：{appendix_dir}{RESET}")
+    print(f"{GREEN}✅{RESET} 附录目录初始化完成：{YELLOW}{appendix_dir}{RESET}")
     return appendix_dir
 
 # ---------- 检查是否已初始化 ----------
@@ -126,7 +126,7 @@ def read_file_list(appendix_dir):
     output_csv = os.path.join(appendix_dir, "files.csv")
 
     if not os.path.exists(output_csv):
-        print(f"{RED}错误:{RESET} files.csv 不存在，请先运行初始化。")
+        print(f"{RED}错误:{RESET} {YELLOW}files.csv{RESET} 不存在，请先运行初始化。")
         return
 
     existing_files = {}  # {文件名: 序号}
@@ -186,11 +186,11 @@ def read_file_list(appendix_dir):
         writer.writerow(["序号", "文件名", "用途"])
         writer.writerows(rows_sorted)
 
-    print(f"{GREEN}✅ 文件列表已更新: {output_csv}{RESET}")
+    print(f"{GREEN}✅{RESET} 文件列表已更新: {YELLOW}{output_csv}{RESET}")
     if skipped_files:
-        print(f"{YELLOW}⭕ 被跳过的文件：{RESET}")
+        print(f"{YELLOW}⭕{RESET} 被跳过的文件：")
         for sf in skipped_files:
-            print(f"  - {sf}")
+            print(f"  - {YELLOW}{sf}{RESET}")
 
 # ---------- 功能2：生成 appendix.tex ----------
 def generate_tex(appendix_dir):
@@ -198,7 +198,7 @@ def generate_tex(appendix_dir):
     output_tex = os.path.join(appendix_dir, "appendix.tex")
 
     if not os.path.exists(output_csv):
-        print(f"{RED}❌ 未找到 files.csv，请先运行初始化。{RESET}")
+        print(f"{RED}❌{RESET} 未找到 {YELLOW}files.csv{RESET}，请先运行初始化。")
         return
 
     rows = []
@@ -211,7 +211,7 @@ def generate_tex(appendix_dir):
                 continue
             rows.append((seq, row["文件名"], row["用途"].strip()))
     if not rows:
-        print(f"{RED}❌ files.csv 为空，请添加文件后再试。{RESET}")
+        print(f"{RED}❌{RESET} {YELLOW}files.csv{RESET} 为空，请添加文件后再试。")
         return
 
     rows.sort(key=lambda x: x[0])
@@ -277,7 +277,7 @@ def generate_tex(appendix_dir):
     with open(output_tex, "w", encoding="utf-8") as f:
         f.write("\n".join(tex_lines))
 
-    print(f"{GREEN}✅ 已生成 LaTeX 文件: {output_tex}{RESET}")
+    print(f"{GREEN}✅{RESET} 已生成 LaTeX 文件: {YELLOW}{output_tex}{RESET}")
 
 # ---------- 主菜单 ----------
 def main():
@@ -292,7 +292,7 @@ def main():
     else:
         base_dir = os.path.abspath(target_dir)
         if not os.path.isdir(base_dir):
-            print(f"{RED}错误:{RESET} 目录 '{base_dir}' 不存在。")
+            print(f"{RED}错误:{RESET} 目录 '{YELLOW}{base_dir}{RESET}' 不存在。")
             sys.exit(1)
 
     # 如果带 --init，只初始化并退出
@@ -301,15 +301,15 @@ def main():
         sys.exit(0)
 
     # 进入交互菜单
-    print(f"{CYAN}工作目录: {base_dir}{RESET}")
+    print(f"{CYAN}工作目录: {RESET}{YELLOW}{base_dir}{RESET}")
     while True:
         print(f"{PURPLE}🎚️ 请选择功能：{RESET}")
-        print("0. 初始化目录结构")
-        print("1. 读取文件列表并生成/更新 CSV")
-        print("2. 生成附录 .tex 文件")
-        print("q. 退出")
+        print(f"{PURPLE}0.{RESET} 初始化目录结构")
+        print(f"{PURPLE}1.{RESET} 读取文件列表并生成/更新 CSV")
+        print(f"{PURPLE}2.{RESET} 生成附录 .tex 文件")
+        print(f"{PURPLE}q.{RESET} 退出")
 
-        choice = input("请输入选项 (0/1/2/q): ").strip().lower()
+        choice = input(f"{CYAN}请输入选项 (0/1/2/q): {RESET}").strip().lower()
 
         if choice == "0":
             init_environment(base_dir)

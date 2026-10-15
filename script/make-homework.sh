@@ -4,7 +4,6 @@
 
 # ===== 颜色定义 =====
 RESET='\033[0m'
-BOLD='\033[1m'
 RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
@@ -32,7 +31,7 @@ cleanup_all() {
 # ===== 帮助信息 =====
 usage() {
     printf "${CYAN}用法：${RESET}\n"
-    printf "  %s <工作目录>\n" "$(basename "$0")"
+    printf "  ${YELLOW}%s${RESET} <工作目录>\n" "$(basename "$0")"
     printf "\n${CYAN}选项：${RESET}\n"
     printf "  -h, --help  显示此帮助信息\n"
     printf "\n${CYAN}说明：${RESET}\n"
@@ -48,14 +47,14 @@ fi
 
 if [ "$#" -ne 1 ]; then
     printf "${RED}错误：${RESET}缺少工作目录参数\n"
-    printf "用法：%s <工作目录>\n" "$(basename "$0")"
+    printf "用法：${YELLOW}%s${RESET} <工作目录>\n" "$(basename "$0")"
     exit 1
 fi
 
 WORK_DIR="$1"
 
 if [ ! -d "$WORK_DIR" ]; then
-    printf "${RED}错误：${RESET}工作目录不存在：%s\n" "$WORK_DIR"
+    printf "${RED}错误：${RESET}工作目录不存在：${YELLOW}%s${RESET}\n" "$WORK_DIR"
     exit 1
 fi
 
@@ -64,7 +63,7 @@ HOMEWORK_DIR="$WORK_DIR/homework"
 
 # ===== 若 homework/ 不存在，询问是否初始化 =====
 if [ ! -d "$HOMEWORK_DIR" ]; then
-    printf "${YELLOW}工作目录下未找到 homework/ 文件夹，是否初始化创建？[Y/n] ${RESET}"
+    printf "${CYAN}工作目录下未找到 ${YELLOW}homework/${RESET}${CYAN} 文件夹，是否初始化创建？[Y/n] ${RESET}"
     read -r answer
     if [[ "$answer" =~ ^[Nn]$ ]]; then
         printf "${YELLOW}已取消操作${RESET}\n"
@@ -74,7 +73,7 @@ if [ ! -d "$HOMEWORK_DIR" ]; then
         cat > "$HOMEWORK_DIR/week1/homework.tex" <<EOF
 % 在此填写作业内容
 EOF
-        printf "${GREEN}已创建 homework/week1/homework.tex${RESET}\n"
+        printf "${GREEN}已创建${RESET} ${YELLOW}homework/week1/homework.tex${RESET}\n"
         exit 0
     fi
 fi
@@ -83,11 +82,11 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 MAKE_CORE="$SCRIPT_DIR/make-core.sh"
 if [ ! -f "$MAKE_CORE" ]; then
-    printf "${RED}错误：${RESET}找不到 make-core.sh：%s\n" "$MAKE_CORE"
+    printf "${RED}错误：${RESET}找不到 ${YELLOW}make-core.sh：%s${RESET}\n" "$MAKE_CORE"
     exit 1
 fi
 if [ ! -x "$MAKE_CORE" ]; then
-    printf "${RED}错误：${RESET}make-core.sh 不可执行：%s\n" "$MAKE_CORE"
+    printf "${RED}错误：${RESET}${YELLOW}make-core.sh${RESET} 不可执行：${YELLOW}%s${RESET}\n" "$MAKE_CORE"
     exit 1
 fi
 
@@ -98,7 +97,7 @@ trap cleanup_all EXIT
 
 HOMEWORK_COUNT="$(wc -l < "$HOMEWORK_LIST" | tr -d ' ')"
 if [ "$HOMEWORK_COUNT" -eq 0 ]; then
-    printf "${RED}错误：${RESET}homework/ 下没有找到作业目录\n"
+    printf "${RED}错误：${RESET}${YELLOW}homework/${RESET} 下没有找到作业目录\n"
     exit 1
 fi
 
@@ -114,7 +113,7 @@ done < "$HOMEWORK_LIST"
 COL_WIDTH=$((MAX_LEN + 2))
 
 # 显示作业列表
-printf "\n${CYAN}=== 请选择作业 ===${RESET}\n\n"
+printf "\n${PURPLE}=== 请选择作业 ===${RESET}\n\n"
 INDEX=1
 for DIR in "${DIRS[@]}"; do
     NAME="$(basename "$DIR")"
@@ -125,7 +124,7 @@ echo
 
 # 选择序号
 while true; do
-    printf "${CYAN}请输入序号：\n${RESET}"
+    printf "${CYAN}请输入序号：${RESET}\n"
     read -e -r CHOICE
     case "$CHOICE" in
         ''|*[!0-9]*)
@@ -144,12 +143,12 @@ SELECTED_DIR="${DIRS[$((CHOICE - 1))]}"
 SELECTED_NAME="$(basename "$SELECTED_DIR")"
 
 if ! cd "$SELECTED_DIR"; then
-    printf "${RED}错误：${RESET}无法进入作业目录：%s\n" "$SELECTED_DIR"
+    printf "${RED}错误：${RESET}无法进入作业目录：${YELLOW}%s${RESET}\n" "$SELECTED_DIR"
     exit 1
 fi
 
 printf "\n${GREEN}已选择：${RESET}${YELLOW}%s${RESET}\n" "$SELECTED_NAME"
-printf "${CYAN}当前目录：${RESET}%s\n\n" "$PWD"
+printf "${CYAN}当前目录：${RESET}${YELLOW}%s${RESET}\n\n" "$PWD"
 
 # ===== 调用 make-core.sh --auto =====
 TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/make-homework.XXXXXX")"
@@ -172,10 +171,10 @@ while IFS= read -r LINE <&4; do
             ORDER="${LINE#@CONFLICT order=}"
             CONFLICT_FILE="$(get_core_conflict "$ORDER")"
             if [ $? -eq 0 ] && [ -n "$CONFLICT_FILE" ]; then
-                printf "${GREEN}[AUTO]${RESET} order=%s -> %s\n" "$ORDER" "$CONFLICT_FILE"
+                printf "${GREEN}[AUTO]${RESET} order=%s -> ${YELLOW}%s${RESET}\n" "$ORDER" "$CONFLICT_FILE"
                 printf '%s\n' "$CONFLICT_FILE" >&3
             else
-                printf "${YELLOW}请手动输入文件名：\n${RESET}"
+                printf "${CYAN}请手动输入文件名：${RESET}\n"
                 read -e -r MANUAL_FILE
                 printf '%s\n' "$MANUAL_FILE" >&3
             fi
@@ -190,20 +189,20 @@ CORE_STATUS=$?
 CORE_PID=""
 
 if [ "$CORE_STATUS" -ne 0 ]; then
-    printf "\n${RED}错误：${RESET}make-core.sh 执行失败，make-homework.sh 停止\n"
+    printf "\n${RED}错误：${RESET}${YELLOW}make-core.sh${RESET} 执行失败，${YELLOW}make-homework.sh${RESET} 停止\n"
     exit "$CORE_STATUS"
 fi
 
 if [ ! -f "$SELECTED_DIR/core-setting.tex" ]; then
-    printf "\n${RED}错误：${RESET}make-core.sh 正常结束，但未找到 core-setting.tex\n"
+    printf "\n${RED}错误：${RESET}${YELLOW}make-core.sh${RESET} 正常结束，但未找到 ${YELLOW}core-setting.tex${RESET}\n"
     exit 1
 fi
 
-printf "\n${GREEN}✓${RESET} core-setting.tex 已生成\n"
+printf "\n${GREEN}✓${RESET} ${YELLOW}core-setting.tex${RESET} 已生成\n"
 printf "  ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/core-setting.tex"
 
 # ===== 第二阶段：收集信息，生成 make.tex =====
-printf "\n${CYAN}=== 输入有关信息 ===${RESET}\n"
+printf "\n${PURPLE}=== 输入有关信息 ===${RESET}\n"
 
 # 课程名称
 COURSE_NAME=""
@@ -212,7 +211,7 @@ if [ -f "$MAIN_NOTE" ]; then
     COURSE_NAME=$(grep -E '^\\covertitle\{[^}]*\}' "$MAIN_NOTE" | head -1 | sed -E 's/^\\covertitle\{([^}]*)\}/\1/')
 fi
 if [ -z "$COURSE_NAME" ]; then
-    printf "${CYAN}未从 main-note.tex 中找到 \\covertitle，请输入课程名称：\n${RESET}"
+    printf "${CYAN}未从 ${YELLOW}main-note.tex${RESET}${CYAN} 中找到 \\covertitle，请输入课程名称：${RESET}\n"
     read -e -r COURSE_NAME
 fi
 
@@ -243,14 +242,14 @@ if [ -z "$WEEK" ]; then
     fi
 fi
 if [ -z "$WEEK" ]; then
-    printf "${CYAN}未从 homework.tex 或目录名中解析出周次，请输入周次(数字)：\n${RESET}"
+    printf "${CYAN}未从 ${YELLOW}homework.tex${RESET}${CYAN} 或目录名中解析出周次，请输入周次(数字)：${RESET}\n"
     read -e -r WEEK
 fi
 
 # 姓名与学号
-printf "${CYAN}请输入学生姓名：\n${RESET}"
+printf "${CYAN}请输入学生姓名：${RESET}\n"
 read -e -r STUDENT_NAME
-printf "${CYAN}请输入学号：\n${RESET}"
+printf "${CYAN}请输入学号：${RESET}\n"
 read -e -r STUDENT_ID
 
 # 生成 make.tex
@@ -275,19 +274,19 @@ ${PS_BLOCK}\input{homework.tex}
 \end{document}
 EOF
 
-printf "\n${GREEN}✓${RESET} make.tex 已生成 ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/make.tex"
+printf "\n${GREEN}✓${RESET} ${YELLOW}make.tex${RESET} 已生成 ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/make.tex"
 
 LOGO_SRC="$SCRIPT_DIR/../template/logo/logo.pdf"
 if [ -f "$LOGO_SRC" ]; then
     cp "$LOGO_SRC" "$SELECTED_DIR/"
-    printf "${GREEN}✓${RESET} logo.pdf 已复制 ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/"
+    printf "${GREEN}✓${RESET} ${YELLOW}logo.pdf${RESET} 已复制 ${YELLOW}%s${RESET}\n" "$SELECTED_DIR/"
 else
-    printf "${YELLOW}警告：${RESET}未找到 ${YELLOW}%s${RESET}，请手动将 logo.pdf 放入 ${YELLOW}%s${RESET}\n" "$LOGO_SRC" "$SELECTED_DIR/"
+    printf "${YELLOW}警告：${RESET}未找到 ${YELLOW}%s${RESET}，请手动将 ${YELLOW}logo.pdf${RESET} 放入 ${YELLOW}%s${RESET}\n" "$LOGO_SRC" "$SELECTED_DIR/"
 fi
 
 
 # ===== 第三阶段：编译 make.tex → PDF =====
-printf "\n${CYAN}=== 正在编译 ===${RESET}\n"
+printf "\n${PURPLE}=== 正在编译 ===${RESET}\n"
 
 cd "$SELECTED_DIR" || exit 1
 
@@ -311,7 +310,7 @@ open_pdf() {
 
 compile_once() {
     local label="$1"
-    printf "%s..." "$label"
+    printf "${CYAN}%s...${RESET}" "$label"
     if xelatex -interaction=nonstopmode make.tex > /dev/null 2>&1; then
         printf "${GREEN}完成${RESET}\n"
         return 0
@@ -325,7 +324,7 @@ compile_once() {
 # 收尾：重命名最终 PDF 并清理辅助文件
 finalize_output() {
     if [ ! -f "make.pdf" ]; then
-        printf "${RED}错误：${RESET}未找到 make.pdf\n"
+        printf "${RED}错误：${RESET}未找到 ${YELLOW}make.pdf${RESET}\n"
         return 1
     fi
 
@@ -342,7 +341,7 @@ for i in 1 2; do
 done
 
 if [ ! -f "make.pdf" ]; then
-    printf "${RED}错误：${RESET}未找到 make.pdf\n"
+    printf "${RED}错误：${RESET}未找到 ${YELLOW}make.pdf${RESET}\n"
     exit 1
 fi
 
@@ -359,7 +358,7 @@ while true; do
     case "$ACTION" in
         1)
             if [ ! -f "make.pdf" ]; then
-                printf "${RED}错误：${RESET}未找到 make.pdf\n"
+                printf "${RED}错误：${RESET}未找到 ${YELLOW}make.pdf${RESET}\n"
                 continue
             fi
             open_pdf "$SELECTED_DIR/make.pdf"
@@ -372,7 +371,7 @@ while true; do
 
             AUTO_PRINT="$SCRIPT_DIR/auto-print.sh"
             if [ ! -f "$AUTO_PRINT" ]; then
-                printf "${RED}错误：${RESET}找不到 auto-print.sh：%s\n" "$AUTO_PRINT"
+                printf "${RED}错误：${RESET}找不到 ${YELLOW}auto-print.sh${RESET}：${YELLOW}%s${RESET}\n" "$AUTO_PRINT"
                 exit 1
             fi
 

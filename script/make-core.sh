@@ -3,7 +3,6 @@
 # @description*: 将模板设置文件合并生成 core-setting.tex 文件
 
 RESET='\033[0m'
-BOLD='\033[1m'
 RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
@@ -16,9 +15,9 @@ TARGET_DIR=""
 
 usage() {
     if [ $AUTO_MODE -eq 0 ]; then
-        printf "%b\n" "${CYAN}用法:${RESET} $0 [目标目录]"
-        printf "%b\n" "生成 core-setting.tex 到目标目录"
-        printf "%b\n" "或: $0 --auto <目标目录>  (机器自动化模式)"
+        printf "%b\n" "${CYAN}用法:${RESET} ${YELLOW}$0${RESET} [目标目录]"
+        printf "%b\n" "生成 ${YELLOW}core-setting.tex${RESET} 到目标目录"
+        printf "%b\n" "或: ${YELLOW}$0${RESET} --auto <目标目录>  (机器自动化模式)"
     else
         # 机器模式下不输出人类友好信息，直接退出
         exit 1
@@ -131,7 +130,7 @@ print_module() {
     printf "${PURPLE}[%d]${RESET} ${YELLOW}%-*s${RESET}${CYAN}(%d)${RESET}" \
         "$num" "$col_width" "$name" "${ORDERS[$i]}"
     if [ "$show_desc" -eq 1 ] && [ -n "${DESCRIPTIONS[$i]}" ]; then
-        printf " ${GREEN}%s${RESET}" "${DESCRIPTIONS[$i]}"
+        printf " %s" "${DESCRIPTIONS[$i]}"
     fi
     printf "\n"
 }
@@ -318,7 +317,7 @@ else
         fi
 
         if [ "${#OLD_ORDERS[@]}" -gt 0 ]; then
-            printf "\n${GREEN}>>> 检测到已有配置 >>>${RESET}\n"
+            printf "\n${PURPLE}>>> 检测到已有配置 >>>${RESET}\n"
             for idx in "${!OLD_ORDERS[@]}"; do
                 order="${OLD_ORDERS[$idx]}"
                 name="${OLD_NAMES[$idx]}"
@@ -327,15 +326,15 @@ else
                     printf "${GREEN}✓${RESET} ${YELLOW}%-*s${RESET}${CYAN}(%s)${RESET}" \
                         "$col_width" "$(basename "${FILES[$found_idx]}")" "$order"
                     if [ -n "$name" ] && [ "$name" != "$(basename "${FILES[$found_idx]}")" ]; then
-                        printf " ${RED}(原文件名: %s)${RESET}" "$name"
+                        printf " ${RED}(原文件名:${RESET} ${YELLOW}%s${RESET}${RED})${RESET}" "$name"
                     fi
                     printf "\n"
                 else
-                    printf "${RED}! 消失模块 order=%s name=%s${RESET}\n" "$order" "$name"
+                    printf "${RED}! 消失模块${RESET} order=%s name=${YELLOW}%s${RESET}\n" "$order" "$name"
                 fi
             done
 
-            printf "是否使用上一次配置?[Y/n] "
+            printf "${CYAN}是否使用上一次配置?[Y/n] ${RESET}"
             read -r reuse
             if [[ ! "$reuse" =~ ^[Nn]$ ]]; then
                 declare -a SELECTED
@@ -358,7 +357,7 @@ else
         global_num=1
 
         # 1. 必要模块 (0-19)
-        printf "\n${CYAN}=== 必要模块 (0-19) ===${RESET}\n"
+        printf "\n${PURPLE}=== 必要模块 (0-19) ===${RESET}\n"
         declare -a REQ_INDICES
         for i in "${SORTED[@]}"; do
             if [ "${ORDERS[$i]}" -lt 20 ]; then
@@ -384,20 +383,20 @@ else
                 print_module "$global_num" "${group[0]}" 1
                 global_num=$((global_num+1))
             else
-                printf "\n${RED}冲突: order=%s 有多个模块，请选择一个保留${RESET}\n" "$ord"
+                printf "\n${RED}冲突:${RESET} order=%s 有多个模块，请选择一个保留\n" "$ord"
                 idx=0
                 for g in "${group[@]}"; do
                     idx=$((idx+1))
                     name=$(basename "${FILES[$g]}")
-                    printf "${RED}[冲突%d]${RESET} ${BOLD}${YELLOW}%s${RESET}${RESET} ${CYAN}(%d)${RESET}" \
+                    printf "${RED}[冲突%d]${RESET} ${YELLOW}%s${RESET} ${CYAN}(%d)${RESET}" \
                         "$idx" "$name" "${ORDERS[$g]}"
                     if [ -n "${DESCRIPTIONS[$g]}" ]; then
-                        printf " ${GREEN}%s${RESET}" "${DESCRIPTIONS[$g]}"
+                        printf " %s" "${DESCRIPTIONS[$g]}"
                     fi
                     printf "\n"
                 done
                 while true; do
-                    printf "请选择要保留的模块编号 (1-%d): " "${#group[@]}"
+                    printf "${CYAN}请选择要保留的模块编号 (1-%d): ${RESET}" "${#group[@]}"
                     read -r choice
                     if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#group[@]}" ]; then
                         SELECTED+=("${group[$((choice-1))]}")
@@ -419,7 +418,7 @@ else
             fi
         done
         if [ "${#REC[@]}" -gt 0 ]; then
-            printf "\n${CYAN}=== 推荐模块 (20-99) ===${RESET}\n"
+            printf "\n${PURPLE}=== 推荐模块 (20-99) ===${RESET}\n"
             declare -a REC_GLOBAL_IDS
             rec_idx=0
             for i in "${REC[@]}"; do
@@ -429,10 +428,10 @@ else
                 global_num=$((global_num+1))
             done
 
-            printf "是否启用全部推荐模块?[Y/n] "
+            printf "${CYAN}是否启用全部推荐模块?[Y/n] ${RESET}"
             read -r ans
             if [[ "$ans" =~ ^[Nn]$ ]]; then
-                printf "输入要取消的推荐模块的全局编号（空格分隔）："
+                printf "${CYAN}输入要取消的推荐模块的全局编号（空格分隔）：${RESET}"
                 read -r remove
                 declare -a NEW_REC
                 for idx in "${!REC[@]}"; do
@@ -458,7 +457,7 @@ else
             fi
         done
         if [ "${#OPT[@]}" -gt 0 ]; then
-            printf "\n${CYAN}=== 自选模块 (100-999) ===${RESET}\n"
+            printf "\n${PURPLE}=== 自选模块 (100-999) ===${RESET}\n"
             declare -a OPT_GLOBAL_IDS
             opt_idx=0
             for i in "${OPT[@]}"; do
@@ -468,7 +467,7 @@ else
                 global_num=$((global_num+1))
             done
 
-            printf "输入需要加入的自选模块的全局编号（空格分隔）："
+            printf "${CYAN}输入需要加入的自选模块的全局编号（空格分隔）：${RESET}"
             read -r add
             declare -a ADDED_OPT
             for r in $add; do
@@ -499,23 +498,23 @@ else
         :
     else
         # 显示最终确认列表
-        printf "\n${CYAN}=== 确认要加入的模块 ===${RESET}\n"
+        printf "\n${PURPLE}=== 确认要加入的模块 ===${RESET}\n"
         global_num=1
-        printf "${GREEN}>>> 必要模块 >>>${RESET}\n"
+        printf "${PURPLE}>>> 必要模块 >>>${RESET}\n"
         for i in "${FINAL[@]}"; do
             if [ "${ORDERS[$i]}" -lt 20 ]; then
                 print_module "$global_num" "$i" 0
                 global_num=$((global_num+1))
             fi
         done
-        printf "\n${GREEN}>>> 推荐模块 >>>${RESET}\n"
+        printf "\n${PURPLE}>>> 推荐模块 >>>${RESET}\n"
         for i in "${FINAL[@]}"; do
             if [ "${ORDERS[$i]}" -ge 20 ] && [ "${ORDERS[$i]}" -lt 100 ]; then
                 print_module "$global_num" "$i" 0
                 global_num=$((global_num+1))
             fi
         done
-        printf "\n${GREEN}>>> 自选模块 >>>${RESET}\n"
+        printf "\n${PURPLE}>>> 自选模块 >>>${RESET}\n"
         for i in "${FINAL[@]}"; do
             if [ "${ORDERS[$i]}" -ge 100 ]; then
                 print_module "$global_num" "$i" 0
@@ -523,7 +522,7 @@ else
             fi
         done
 
-        printf "\n确认生成?[Y/n] "
+        printf "\n${CYAN}确认生成?[Y/n] ${RESET}"
         read -r confirm
         [[ "$confirm" =~ ^[Nn]$ ]] && exit 0
     fi
@@ -531,5 +530,5 @@ else
     # 生成文件
     generate_output
 
-    printf "\n${GREEN}✓ 已生成${RESET} ${YELLOW}%s${RESET}\n" "$OUTPUT"
+    printf "\n${GREEN}✓${RESET} 已生成 ${YELLOW}%s${RESET}\n" "$OUTPUT"
 fi

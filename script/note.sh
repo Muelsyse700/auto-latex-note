@@ -16,12 +16,10 @@ RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
-BLUE='\033[34m'
-MAGENTA='\033[35m'
-BOLD='\033[1m'
+PURPLE='\033[35m'
 
 usage() {
-    printf '%b\n' "${CYAN}${BOLD}note.sh${RESET}"
+    printf '%b\n' "${CYAN}note.sh${RESET}"
     printf 'latexNote 工具管理器\n'
     printf '\n'
     printf '%b\n' "${CYAN}用法${RESET}"
@@ -92,11 +90,11 @@ show_hidden_menu() {
     while true; do
         printf '\033c'
 
-        printf '%b\n' "${CYAN}${BOLD}latexNote 隐藏脚本${RESET}"
-        printf '当前目录：%s\n' "$TARGET_DIR"
+        printf '%b\n' "${PURPLE}latexNote 隐藏脚本${RESET}"
+        printf '%b\n' "${CYAN}当前目录：${RESET}${YELLOW}${TARGET_DIR}${RESET}"
         printf '\n'
 
-        printf '%b\n' "${MAGENTA}${BOLD}=== 隐藏脚本 ===${RESET}"
+        printf '%b\n' "${PURPLE}=== 隐藏脚本 ===${RESET}"
 
         if [ "${#HIDDEN_SCRIPT_FILES[@]}" -eq 0 ]; then
             printf '  暂无隐藏脚本\n'
@@ -104,14 +102,14 @@ show_hidden_menu() {
             for i in "${!HIDDEN_SCRIPT_FILES[@]}"; do
                 number=$((i + 1))
 
-                printf '%b' "${YELLOW}  ${number}${RESET}) "
-                printf '%b\n' "${GREEN}${HIDDEN_SCRIPT_NAMES[$i]}${RESET}"
+                printf '%b' "${PURPLE}  ${number}${RESET}) "
+                printf '%b\n' "${YELLOW}${HIDDEN_SCRIPT_NAMES[$i]}${RESET}"
                 printf '     %s\n' "${HIDDEN_SCRIPT_DESCRIPTIONS[$i]}"
             done
         fi
 
         printf '\n'
-        printf '%b\n' "${YELLOW}  b${RESET}) 返回主菜单    ${YELLOW}q${RESET}) 退出"
+        printf '%b\n' "${PURPLE}  b${RESET}) 返回主菜单    ${PURPLE}q${RESET}) 退出"
         printf '\n'
 
         printf '%b' "${CYAN}请选择：${RESET}"
@@ -149,7 +147,7 @@ show_hidden_menu() {
         script="${HIDDEN_SCRIPT_FILES[$index]}"
         name="${HIDDEN_SCRIPT_NAMES[$index]}"
 
-        printf '\n%b\n' "${CYAN}正在执行 ${GREEN}${name}${CYAN} ...${RESET}"
+        printf '\n%b\n' "${CYAN}正在执行 ${YELLOW}${name}${CYAN} ...${RESET}"
 
         if [[ "$args" == "-h" || "$args" == "--help" ]]; then
             run_script "$script" "$args"
@@ -176,7 +174,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 fi
 
 if [ $# -gt 0 ]; then
-    printf '%b\n' "${RED}错误：未知参数 $1${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}未知参数 ${YELLOW}$1${RESET}"
     printf '使用 -h 查看帮助信息\n'
     exit 1
 fi
@@ -214,22 +212,22 @@ done < <(
 while true; do
     printf '\033c'
 
-    printf '%b\n' "${CYAN}${BOLD}latexNote 工具${RESET}"
-    printf '当前目录：%s\n' "$TARGET_DIR"
+    printf '%b\n' "${PURPLE}latexNote 工具${RESET}"
+    printf '%b\n' "${CYAN}当前目录：${RESET}${YELLOW}${TARGET_DIR}${RESET}"
     printf '\n'
 
-    printf '%b\n' "${MAGENTA}${BOLD}=== 工具链 ===${RESET}"
+    printf '%b\n' "${PURPLE}=== 工具链 ===${RESET}"
 
-    printf '%b' "${YELLOW}  1${RESET}) "
-    printf '%b\n' "${BLUE}初始化工具链${RESET}"
+    printf '%b' "${PURPLE}  1${RESET}) "
+    printf '%b\n' "${YELLOW}初始化工具链${RESET}"
     printf '     初始化当前目录的 latexNote 项目\n'
 
-    printf '%b' "${YELLOW}  2${RESET}) "
-    printf '%b\n' "${BLUE}更新模板工具链${RESET}"
+    printf '%b' "${PURPLE}  2${RESET}) "
+    printf '%b\n' "${YELLOW}更新模板工具链${RESET}"
     printf '     更新当前目录的 latexNote 模板\n'
 
     printf '\n'
-    printf '%b\n' "${MAGENTA}${BOLD}=== 脚本工具 ===${RESET}"
+    printf '%b\n' "${PURPLE}=== 脚本工具 ===${RESET}"
 
     start=3
 
@@ -239,14 +237,14 @@ while true; do
         for i in "${!SCRIPT_FILES[@]}"; do
             number=$((start + i))
 
-            printf '%b' "${YELLOW}  ${number}${RESET}) "
-            printf '%b\n' "${GREEN}${SCRIPT_NAMES[$i]}${RESET}"
+            printf '%b' "${PURPLE}  ${number}${RESET}) "
+            printf '%b\n' "${YELLOW}${SCRIPT_NAMES[$i]}${RESET}"
             printf '     %s\n' "${SCRIPT_DESCRIPTIONS[$i]}"
         done
     fi
 
     printf '\n'
-    printf '%b\n' "${YELLOW}  *${RESET}) ${BLUE}显示隐藏脚本${RESET}    ${YELLOW}q${RESET}) 退出"
+    printf '%b\n' "${PURPLE}  *${RESET}) 显示隐藏脚本    ${PURPLE}q${RESET}) 退出"
     printf '\n'
 
     printf '%b' "${CYAN}请选择：${RESET}"
@@ -275,7 +273,7 @@ while true; do
     fi
 
     if [ "$choice" -eq 1 ]; then
-        printf '\n%b\n' "${CYAN}正在执行 ${BLUE}初始化工具链${CYAN} ...${RESET}"
+        printf '\n%b\n' "${CYAN}正在执行 ${YELLOW}初始化工具链${CYAN} ...${RESET}"
 
         if [[ "$args" == "-h" || "$args" == "--help" ]]; then
             run_script "$SCRIPT_DIR/init-update.sh" "$args"
@@ -289,7 +287,7 @@ while true; do
     fi
 
     if [ "$choice" -eq 2 ]; then
-        printf '\n%b\n' "${CYAN}正在执行 ${BLUE}更新模板工具链${CYAN} ...${RESET}"
+        printf '\n%b\n' "${CYAN}正在执行 ${YELLOW}更新模板工具链${CYAN} ...${RESET}"
 
         if [[ "$args" == "-h" || "$args" == "--help" ]]; then
             run_script "$SCRIPT_DIR/init-update.sh" "$args"
@@ -313,7 +311,7 @@ while true; do
     script="${SCRIPT_FILES[$index]}"
     name="${SCRIPT_NAMES[$index]}"
 
-    printf '\n%b\n' "${CYAN}正在执行 ${GREEN}${name}${CYAN} ...${RESET}"
+    printf '\n%b\n' "${CYAN}正在执行 ${YELLOW}${name}${CYAN} ...${RESET}"
 
     if [[ "$args" == "-h" || "$args" == "--help" ]]; then
         run_script "$script" "$args"

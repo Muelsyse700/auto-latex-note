@@ -6,15 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE_DIR="$SCRIPT_DIR/../template"
 
 RESET='\033[0m'
-BOLD='\033[1m'
 RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
-PURPLE='\033[35m'   # 保留，可能与后续扩展一致
+PURPLE='\033[35m'
 
 usage() {
-    printf '%b\n' "${CYAN}用法:${RESET} $(basename "$0") [选项] [目标目录]"
+    printf '%b\n' "${CYAN}用法:${RESET} ${YELLOW}$(basename "$0")${RESET} [选项] [目标目录]"
     printf '%b\n' "在当前目录（或指定目录）初始化或更新一个 latexNote 笔记项目。"
     printf '\n'
     printf '%b\n' "${CYAN}选项:${RESET}"
@@ -60,14 +59,14 @@ while [ $# -gt 0 ]; do
             UPDATE_MODE=true
             ;;
         -*)
-            printf '%b\n' "${RED}未知选项: $1${RESET}" >&2
+            printf '%b\n' "${RED}未知选项:${RESET} ${YELLOW}$1${RESET}" >&2
             usage
             ;;
         *)
             if [ -z "$TARGET_DIR" ]; then
                 TARGET_DIR="$1"
             else
-                printf '%b\n' "${RED}错误：只能指定一个目标目录。${RESET}" >&2
+                printf '%b\n' "${RED}错误：${RESET}只能指定一个目标目录。" >&2
                 exit 1
             fi
             ;;
@@ -84,7 +83,7 @@ set -e
 
 # -------------------- 更新模式 --------------------
 if [ "$UPDATE_MODE" = true ]; then
-    printf '%b\n' "${CYAN}=== latexNote 更新模式 ===${RESET}"
+    printf '%b\n' "${PURPLE}=== latexNote 更新模式 ===${RESET}"
     printf '目标目录：%b\n\n' "${YELLOW}${TARGET_DIR_ABS}${RESET}"
 
     # 确保必要的子目录存在
@@ -92,51 +91,51 @@ if [ "$UPDATE_MODE" = true ]; then
 
     # 复制模板文件（覆盖）
     if [ ! -f "$TEMPLATE_DIR/cover.pdf" ]; then
-        printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/cover.pdf${RESET}"
+        printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/cover.pdf${RESET}"
         exit 1
     fi
     cp "$TEMPLATE_DIR/cover.pdf" "$TARGET_DIR/setting/cover.pdf"
-    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/cover.pdf${RESET}"
+    printf '%b\n' "${GREEN}✓${RESET} 已更新 ${YELLOW}setting/cover.pdf${RESET}"
 
     if [ ! -f "$TEMPLATE_DIR/settings.json" ]; then
-        printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/settings.json${RESET}"
+        printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/settings.json${RESET}"
         exit 1
     fi
     cp "$TEMPLATE_DIR/settings.json" "$TARGET_DIR/.vscode/settings.json"
-    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}.vscode/settings.json${RESET}"
+    printf '%b\n' "${GREEN}✓${RESET} 已更新 ${YELLOW}.vscode/settings.json${RESET}"
 
     if [ ! -f "$TEMPLATE_DIR/note.gitignore" ]; then
-        printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/note.gitignore${RESET}"
+        printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/note.gitignore${RESET}"
         exit 1
     fi
 
     cp "$TEMPLATE_DIR/note.gitignore" "$TARGET_DIR/.gitignore"
-    printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}.gitignore${RESET}"
+    printf '%b\n' "${GREEN}✓${RESET} 已更新 ${YELLOW}.gitignore${RESET}"
 
     # 重新生成 core-setting.tex（make-core.sh 现生成到目标根目录）
-    printf '%b\n' "${CYAN}正在重新生成 core-setting.tex ...${RESET}"
+    printf '%b\n' "${CYAN}正在重新生成 ${YELLOW}core-setting.tex${RESET} ..."
     "$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
     # 将生成的 core-setting.tex 移动到 setting/ 子目录
     if [ -f "$TARGET_DIR/core-setting.tex" ]; then
         mv "$TARGET_DIR/core-setting.tex" "$TARGET_DIR/setting/core-setting.tex"
-        printf '%b\n' "${GREEN}✓ 已更新 ${YELLOW}setting/core-setting.tex${RESET}"
+        printf '%b\n' "${GREEN}✓${RESET} 已更新 ${YELLOW}setting/core-setting.tex${RESET}"
     else
-        printf '%b\n' "${RED}错误：生成 core-setting.tex 失败${RESET}"
+        printf '%b\n' "${RED}错误：${RESET}生成 ${YELLOW}core-setting.tex${RESET} 失败"
         exit 1
     fi
 
     printf '\n'
-    printf '%b\n' "${CYAN}=== auto-latex-note 更新完成 ===${RESET}"
-    printf '%b\n' "${YELLOW}提示：若需更新 main-note.tex 中的内容，请手动调整。${RESET}"
+    printf '%b\n' "${PURPLE}=== auto-latex-note 更新完成 ===${RESET}"
+    printf '%b\n' "${YELLOW}提示：${RESET}若需更新 ${YELLOW}main-note.tex${RESET} 中的内容，请手动调整。"
     exit 0
 fi
 
 # -------------------- 初始化模式 --------------------
-printf '%b\n' "${CYAN}=== latexNote 初始化 ===${RESET}"
-printf '目标目录：%b\n\n' "${CYAN}${TARGET_DIR_ABS}${RESET}"
+printf '%b\n' "${PURPLE}=== latexNote 初始化 ===${RESET}"
+printf '目标目录：%b\n\n' "${YELLOW}${TARGET_DIR_ABS}${RESET}"
 
 if ! command -v git >/dev/null 2>&1; then
-    printf '%b\n' "${RED}错误：未找到 Git，请先安装 Git。${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}未找到 Git，请先安装 Git。"
     exit 1
 fi
 
@@ -149,7 +148,7 @@ mkdir -p \
     "$TARGET_DIR/reference" \
     "$TARGET_DIR/.vscode"
 
-printf '%b\n' "${GREEN}✓ 已创建目录结构${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已创建目录结构"
 
 "$SCRIPT_DIR/make-main-note.sh" "$TARGET_DIR"
 
@@ -157,44 +156,44 @@ printf '%b\n' "${GREEN}✓ 已创建目录结构${RESET}"
 "$SCRIPT_DIR/make-core.sh" "$TARGET_DIR"
 if [ -f "$TARGET_DIR/core-setting.tex" ]; then
     mv "$TARGET_DIR/core-setting.tex" "$TARGET_DIR/setting/core-setting.tex"
-    printf '%b\n' "${GREEN}✓ 已生成 ${YELLOW}setting/core-setting.tex${RESET}"
+    printf '%b\n' "${GREEN}✓${RESET} 已生成 ${YELLOW}setting/core-setting.tex${RESET}"
 else
-    printf '%b\n' "${RED}错误：生成 core-setting.tex 失败${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}生成 ${YELLOW}core-setting.tex${RESET} 失败"
     exit 1
 fi
 
 if [ ! -f "$TEMPLATE_DIR/cover.pdf" ]; then
-    printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/cover.pdf${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/cover.pdf${RESET}"
     exit 1
 fi
 cp "$TEMPLATE_DIR/cover.pdf" "$TARGET_DIR/setting/cover.pdf"
 
 if [ ! -f "$TEMPLATE_DIR/settings.json" ]; then
-    printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/settings.json${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/settings.json${RESET}"
     exit 1
 fi
 cp "$TEMPLATE_DIR/settings.json" "$TARGET_DIR/.vscode/settings.json"
 
 if [ ! -f "$TEMPLATE_DIR/note.gitignore" ]; then
-    printf '%b\n' "${RED}错误：找不到模板文件：$TEMPLATE_DIR/note.gitignore${RESET}"
+    printf '%b\n' "${RED}错误：${RESET}找不到模板文件：${YELLOW}$TEMPLATE_DIR/note.gitignore${RESET}"
     exit 1
 fi
 cp "$TEMPLATE_DIR/note.gitignore" "$TARGET_DIR/.gitignore"
 
 touch "$TARGET_DIR/table/table-index.txt"
-printf '%b\n' "${GREEN}✓ 已创建 ${YELLOW}table/table-index.txt${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已创建 ${YELLOW}table/table-index.txt${RESET}"
 touch "$TARGET_DIR/chapter/chapter1.tex"
-printf '%b\n' "${GREEN}✓ 已创建 ${YELLOW}chapter/chapter1.tex${RESET}"
-printf '%b\n' "${GREEN}✓ 已复制 ${YELLOW}.vscode/settings.json${RESET}"
-printf '%b\n' "${GREEN}✓ 已复制 ${YELLOW}.gitignore${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已创建 ${YELLOW}chapter/chapter1.tex${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已复制 ${YELLOW}.vscode/settings.json${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已复制 ${YELLOW}.gitignore${RESET}"
 
 git -C "$TARGET_DIR" init -b main
-printf '%b\n' "${GREEN}✓ Git 仓库初始化完成${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} Git 仓库初始化完成"
 
 git -C "$TARGET_DIR" add .
 git -C "$TARGET_DIR" commit -m "Initial commit"
-printf '%b\n' "${GREEN}✓ 已提交 Initial commit${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 已提交 Initial commit"
 
 printf '\n'
-printf '%b\n' "${CYAN}=== auto-latex-note 初始化完成 ===${RESET}"
-printf '%b\n' "${YELLOW}提示：首次编译请使用 XeLaTeX*2${RESET}"
+printf '%b\n' "${PURPLE}=== auto-latex-note 初始化完成 ===${RESET}"
+printf '%b\n' "${YELLOW}提示：${RESET}首次编译请使用 XeLaTeX*2"

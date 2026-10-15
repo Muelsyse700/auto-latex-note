@@ -7,9 +7,10 @@ RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
+PURPLE='\033[35m'
 
 usage() {
-    printf '%b\n' "${CYAN}用法:${RESET} $(basename "$0") [选项] [目录]"
+    printf '%b\n' "${CYAN}用法:${RESET} ${YELLOW}$(basename "$0")${RESET} [选项] [目录]"
     printf '%b\n' "清理指定目录（默认当前目录）及其子目录下的 LaTeX 编译辅助文件。"
     printf '\n'
     printf '%b\n' "${CYAN}选项:${RESET}"
@@ -34,14 +35,14 @@ for arg in "$@"; do
             usage
             ;;
         -*)
-            printf '%b\n' "${RED}未知选项: $arg${RESET}" >&2
+            printf '%b\n' "${RED}未知选项:${RESET} ${YELLOW}$arg${RESET}" >&2
             usage
             ;;
         *)
             if [ -z "$TARGET_DIR" ]; then
                 TARGET_DIR="$arg"
             else
-                printf '%b\n' "${RED}错误：只能指定一个目录。${RESET}" >&2
+                printf '%b\n' "${RED}错误：${RESET}只能指定一个目录。" >&2
                 exit 1
             fi
             ;;
@@ -53,15 +54,15 @@ done
 
 # 检查目录是否存在
 if [ ! -d "$TARGET_DIR" ]; then
-    printf '%b\n' "${RED}错误：目录 '$TARGET_DIR' 不存在。${RESET}" >&2
+    printf '%b\n' "${RED}错误：${RESET}目录 '${YELLOW}$TARGET_DIR${RESET}' 不存在。" >&2
     exit 1
 fi
 
 # 获取绝对路径
 TARGET_DIR_ABS="$(cd "$TARGET_DIR" && pwd)"
 
-printf '%b\n' "${CYAN}=== 清理 LaTeX 辅助文件 ===${RESET}"
-printf '%b\n' "目标目录：$TARGET_DIR_ABS"
+printf '%b\n' "${PURPLE}=== 清理 LaTeX 辅助文件 ===${RESET}"
+printf '%b\n' "${CYAN}目标目录：${RESET}${YELLOW}$TARGET_DIR_ABS${RESET}"
 
 # 查找并删除常见 LaTeX 辅助文件，同时打印被删除的文件路径
 find "$TARGET_DIR" -type f \( \
@@ -83,4 +84,4 @@ find "$TARGET_DIR" -type f \( \
     printf '%b\n' "${RED}已删除: ${YELLOW}$file${RESET}"
 done
 
-printf '%b\n' "${GREEN}✓ 清理完成${RESET}"
+printf '%b\n' "${GREEN}✓${RESET} 清理完成"
